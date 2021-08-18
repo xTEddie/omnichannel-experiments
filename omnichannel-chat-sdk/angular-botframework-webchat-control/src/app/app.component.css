@@ -15,6 +15,36 @@
   box-shadow: 0 0 15px 2px rgb(22, 27, 34, 0.3);
 }
 
+#loading-screen {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 400px;
+  min-height: 600px;
+  max-height: 600px;
+  width: 400px;
+  height: 600px;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  margin: 0 20px 60px 0;
+  box-shadow: 0 0 15px 2px rgb(22, 27, 34, 0.3);
+  align-items: center;
+  justify-content: center;
+}
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+#loader {
+  font-size: 120px;
+  -webkit-animation:spin 2s linear infinite;
+  -moz-animation:spin 2s linear infinite;
+  animation:spin 2s linear infinite;
+}
+
 #chat-button {
   position: fixed;
   right: 0;

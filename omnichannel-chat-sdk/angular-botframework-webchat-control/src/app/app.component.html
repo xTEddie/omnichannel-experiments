@@ -1,7 +1,10 @@
 <div id="root">
   <button (click)="endChat()"> End Chat </button>
   <div id="chat-container" *ngIf="hasChatStarted"></div>
-  <div id="chat-button" *ngIf="!hasChatStarted" (click)="startChat()">
+  <div id="loading-screen" *ngIf="loading">
+    <span id="loader"> 👀 </span>
+  </div>
+  <div id="chat-button" *ngIf="!hasChatStarted && !loading" (click)="startChat()">
     <span> 👋 </span>
   </div>
 </div>

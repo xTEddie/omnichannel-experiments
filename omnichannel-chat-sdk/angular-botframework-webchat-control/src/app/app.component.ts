@@ -17,6 +17,7 @@ export class AppComponent {
   webChat: any = null;
   chatSDK: OmnichannelChatSDK | null = null;
   chatAdapter: any = null;
+  loading: boolean = false;
   hasChatStarted: boolean = false;
 
   constructor(
@@ -48,11 +49,16 @@ export class AppComponent {
 
   async startChat() {
     console.log('[startChat]');
+
+    this.loading = true;
+
     await this.chatSDK?.startChat();
     this.hasChatStarted = true;
 
     const chatAdapter = await this.chatSDK?.createChatAdapter();
     this.chatAdapter = chatAdapter;
+
+    this.loading = false;
 
     this.webChat.renderWebChat(
       {
