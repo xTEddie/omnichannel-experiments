@@ -1,0 +1,16 @@
+#chat-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 400px;
+  min-height: 600px;
+  max-height: 600px;
+  width: 400px;
+  height: 600px;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  margin: 0 20px 60px 0;
+  box-shadow: 0 0 15px 2px rgb(22, 27, 34, 0.3);
+}

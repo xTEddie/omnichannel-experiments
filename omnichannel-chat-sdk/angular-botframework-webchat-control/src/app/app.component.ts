@@ -17,6 +17,7 @@ export class AppComponent {
   webChat: any = null;
   chatSDK: OmnichannelChatSDK | null = null;
   chatAdapter: any = null;
+  hasChatStarted: boolean = false;
 
   constructor(
     private readonly webChatControlService: WebChatControlService, @Inject(DOCUMENT) private readonly document: any
@@ -48,6 +49,7 @@ export class AppComponent {
   async startChat() {
     console.log('[startChat]');
     await this.chatSDK?.startChat();
+    this.hasChatStarted = true;
 
     const chatAdapter = await this.chatSDK?.createChatAdapter();
     this.chatAdapter = chatAdapter;
@@ -63,6 +65,7 @@ export class AppComponent {
   async endChat() {
     console.log('[endChat]');
     await this.chatSDK?.endChat();
+    this.hasChatStarted = false;
 
     // Remove all children
     const parent = this.document.getElementById('chat-container');
