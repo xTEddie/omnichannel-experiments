@@ -4,9 +4,11 @@
 
 export const environment = {
   production: false,
-  orgId: '',
-  orgUrl: '',
-  widgetId: ''
+  omnichannelConfig: {
+    orgId: '',
+    orgUrl: '',
+    widgetId: ''
+  }
 };
 
 /*

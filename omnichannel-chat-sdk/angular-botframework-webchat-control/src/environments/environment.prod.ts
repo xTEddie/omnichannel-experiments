@@ -1,6 +1,8 @@
 export const environment = {
   production: true,
-  orgId: '',
-  orgUrl: '',
-  widgetId: ''
+  omnichannelConfig: {
+    orgId: '',
+    orgUrl: '',
+    widgetId: ''
+  }
 };
