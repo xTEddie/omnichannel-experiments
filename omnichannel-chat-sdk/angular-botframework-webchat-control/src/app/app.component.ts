@@ -7,6 +7,17 @@ import { WebChatControlService } from './web-chat-control.service';
 console.log(`%c [OmnichannelConfig]`, 'background-color:#001433;color:#fff');
 console.log(environment.omnichannelConfig);
 
+const styleOptions = {
+  bubbleBorderRadius: 10,
+  bubbleNubSize: 10,
+  bubbleNubOffset: 15,
+
+  bubbleFromUserBorderRadius: 10,
+  bubbleFromUserNubSize: 10,
+  bubbleFromUserNubOffset: 15,
+  bubbleFromUserBackground: 'rgb(246, 246, 246)'
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -50,10 +61,10 @@ export class AppComponent {
   async startChat() {
     console.log('[startChat]');
 
+    this.hasChatStarted = true;
     this.loading = true;
 
     await this.chatSDK?.startChat();
-    this.hasChatStarted = true;
 
     const chatAdapter = await this.chatSDK?.createChatAdapter();
     this.chatAdapter = chatAdapter;
@@ -62,7 +73,8 @@ export class AppComponent {
 
     this.webChat.renderWebChat(
       {
-        directLine: chatAdapter
+        directLine: chatAdapter,
+        styleOptions
       },
       this.document.getElementById('chat-container')
     );

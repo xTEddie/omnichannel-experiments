@@ -1,8 +1,10 @@
 <div id="root">
-  <button (click)="endChat()"> End Chat </button>
-  <div id="chat-container" *ngIf="hasChatStarted"></div>
-  <div id="loading-screen" *ngIf="loading">
-    <span id="loader"> 👀 </span>
+  <div id="chat-root" *ngIf="hasChatStarted">
+    <div class="chat-header">LiveChat with Omnichannel Chat SDK <span (click)="endChat()"> ❌ </span> </div>
+    <div id="loading-screen" *ngIf="loading">
+      <span id="loader"> 👀 </span>
+    </div>
+    <div id="chat-container"></div>
   </div>
   <div id="chat-button" *ngIf="!hasChatStarted && !loading" (click)="startChat()">
     <span> 👋 </span>
