@@ -79,6 +79,7 @@ export class AppComponent {
     this.webChat.renderWebChat(
       {
         directLine: chatAdapter,
+        sendTypingIndicator: true,
         styleOptions,
         store: this.webChatStore
       },
