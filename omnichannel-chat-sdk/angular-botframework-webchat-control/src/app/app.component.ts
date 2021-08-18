@@ -29,7 +29,7 @@ export class AppComponent {
     this.webChatControlService.lazyLoad().subscribe(async (_) => {
       this.webChat = (window as any).WebChat;
 
-      console.log(this.webChat);
+      // console.log(this.webChat);
 
       const chatSDKConfig = {
         telemetry: {

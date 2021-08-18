@@ -1,5 +1,7 @@
 <div id="root">
-  <button (click)="startChat()"> Start Chat </button>
   <button (click)="endChat()"> End Chat </button>
   <div id="chat-container" *ngIf="hasChatStarted"></div>
+  <div id="chat-button" *ngIf="!hasChatStarted" (click)="startChat()">
+    <span> 👋 </span>
+  </div>
 </div>
