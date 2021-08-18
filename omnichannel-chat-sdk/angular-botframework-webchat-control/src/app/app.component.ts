@@ -3,6 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { environment } from './../environments/environment';
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { WebChatControlService } from './web-chat-control.service';
+import createCustomStore from './createCustomStore';
 
 console.log(`%c [OmnichannelConfig]`, 'background-color:#001433;color:#fff');
 console.log(environment.omnichannelConfig);
@@ -30,6 +31,7 @@ export class AppComponent {
   chatAdapter: any = null;
   loading: boolean = false;
   hasChatStarted: boolean = false;
+  webChatStore: any = null;
 
   constructor(
     private readonly webChatControlService: WebChatControlService, @Inject(DOCUMENT) private readonly document: any
@@ -61,6 +63,9 @@ export class AppComponent {
   async startChat() {
     console.log('[startChat]');
 
+    const store = createCustomStore();
+    this.webChatStore = store.create();
+
     this.hasChatStarted = true;
     this.loading = true;
 
@@ -74,7 +79,8 @@ export class AppComponent {
     this.webChat.renderWebChat(
       {
         directLine: chatAdapter,
-        styleOptions
+        styleOptions,
+        store: this.webChatStore
       },
       this.document.getElementById('chat-container')
     );
