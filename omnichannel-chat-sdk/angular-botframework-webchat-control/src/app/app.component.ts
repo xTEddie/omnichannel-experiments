@@ -1,6 +1,10 @@
 import { Component, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { environment } from './../environments/environment';
 import { WebChatControlService } from './web-chat-control.service';
+
+console.log(`%c [OmnichannelConfig]`, 'background-color:#001433;color:#fff');
+console.log(environment.omnichannelConfig);
 
 @Component({
   selector: 'app-root',
