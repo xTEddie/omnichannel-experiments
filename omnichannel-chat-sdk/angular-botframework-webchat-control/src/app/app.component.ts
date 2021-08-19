@@ -6,6 +6,7 @@ import { WebChatControlService } from './web-chat-control.service';
 import createCustomStore from './createCustomStore';
 import createAvatarMiddleware from './createAvatarMiddleware';
 import createActivityMiddleware from './createActivityMiddleware';
+import { createDataMaskingMiddleware } from './createDataMaskingMiddleware';
 
 console.log(`%c [OmnichannelConfig]`, 'background-color:#001433;color:#fff');
 console.log(environment.omnichannelConfig);
@@ -67,8 +68,13 @@ export class AppComponent {
   async startChat() {
     console.log('[startChat]');
 
+    const dataMaskingRules = await this.chatSDK?.getDataMaskingRules();
+    console.log(dataMaskingRules);
+
     const store = createCustomStore();
     this.webChatStore = store.create();
+
+    store.subscribe('DataMasking', createDataMaskingMiddleware(dataMaskingRules));
 
     this.hasChatStarted = true;
     this.loading = true;
