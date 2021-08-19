@@ -18,7 +18,7 @@
     "@angular/platform-browser": "~12.2.0",
     "@angular/platform-browser-dynamic": "~12.2.0",
     "@angular/router": "~12.2.0",
-    "@microsoft/omnichannel-chat-sdk": "^0.2.1-main.5ae454d",
+    "@microsoft/omnichannel-chat-sdk": "^0.2.1-main.02dac57",
     "react": "^17.0.2",
     "rxjs": "^6.6.7",
     "tslib": "^2.3.0",
