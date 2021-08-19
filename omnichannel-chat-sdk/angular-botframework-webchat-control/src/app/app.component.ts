@@ -4,9 +4,13 @@ import { environment } from './../environments/environment';
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { WebChatControlService } from './web-chat-control.service';
 import createCustomStore from './createCustomStore';
+import createAvatarMiddleware from './createAvatarMiddleware';
+import createActivityMiddleware from './createActivityMiddleware';
 
 console.log(`%c [OmnichannelConfig]`, 'background-color:#001433;color:#fff');
 console.log(environment.omnichannelConfig);
+const avatarMiddleware: any = createAvatarMiddleware();
+const activityMiddleware: any = createActivityMiddleware();
 
 const styleOptions = {
   bubbleBorderRadius: 10,
@@ -81,7 +85,9 @@ export class AppComponent {
         directLine: chatAdapter,
         sendTypingIndicator: true,
         styleOptions,
-        store: this.webChatStore
+        store: this.webChatStore,
+        avatarMiddleware,
+        activityMiddleware
       },
       this.document.getElementById('chat-container')
     );
