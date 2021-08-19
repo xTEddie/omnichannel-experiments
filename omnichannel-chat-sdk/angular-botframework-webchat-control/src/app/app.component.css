@@ -1,0 +1,93 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+#chat-root {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 400px;
+  min-height: 600px;
+  max-height: 600px;
+  width: 400px;
+  height: 600px;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  margin: 0 20px 60px 0;
+  box-shadow: 0 0 15px 2px rgb(22, 27, 34, 0.3);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+#chat-container {
+  width: 100%;
+  height: 100%;;
+}
+
+.chat-header {
+  border-bottom: #E6E6E6 solid 1px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+#loading-screen {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 400px;
+  min-height: 600px;
+  max-height: 600px;
+  width: 400px;
+  height: 600px;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  margin: 0 20px 60px 0;
+  box-shadow: 0 0 15px 2px rgb(22, 27, 34, 0.3);
+  align-items: center;
+  justify-content: center;
+}
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+#loader {
+  font-size: 120px;
+  -webkit-animation:spin 2s linear infinite;
+  -moz-animation:spin 2s linear infinite;
+  animation:spin 2s linear infinite;
+}
+
+#chat-button {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-radius: 32px;
+  background-color: rgb(0, 120, 212);
+  box-shadow: 0 0 5px 2px rgb(0, 120, 212);
+  padding: 10px;
+  margin: 0 20px 20px 0;
+  color: #FFF;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+#chat-button:hover {
+  box-shadow: 0 0 20px 2px rgb(0, 120, 212);
+  transition: all 2s;
+}
