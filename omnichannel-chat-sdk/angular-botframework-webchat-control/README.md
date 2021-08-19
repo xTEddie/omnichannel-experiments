@@ -19,7 +19,7 @@ The sample app includes the following scenarios:
 - [ ] Download transcript
 - [ ] Email transcript
 - [ ] Pre-Chat Survey
-- [ ] Reconnect existing chat
+- [X] Reconnect existing chat
 - [X] Data masking middleware
 - [ ] Attachment middleware
 - [ ] Escalation to Voice & Video

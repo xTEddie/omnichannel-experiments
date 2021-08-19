@@ -62,6 +62,12 @@ export class AppComponent {
 
       this.chatSDK = chatSDK;
       this.webChat = (window as any).WebChat;
+
+      const liveChatContext = localStorage.getItem('liveChatContext');
+      if (liveChatContext && Object.keys(JSON.parse(liveChatContext)).length > 0) {
+        console.log("[liveChatContext]");
+        console.log(liveChatContext);
+      }
     });
   }
 
@@ -76,10 +82,25 @@ export class AppComponent {
 
     store.subscribe('DataMasking', createDataMaskingMiddleware(dataMaskingRules));
 
+    const optionalParams: any = {};
+
+    // Check for active conversation in cache
+    const cachedLiveChatContext = localStorage.getItem('liveChatContext');
+    if (cachedLiveChatContext && Object.keys(JSON.parse(cachedLiveChatContext)).length > 0) {
+      console.log("[liveChatContext]");
+      optionalParams.liveChatContext = JSON.parse(cachedLiveChatContext);
+    }
+
     this.hasChatStarted = true;
     this.loading = true;
 
-    await this.chatSDK?.startChat();
+    await this.chatSDK?.startChat(optionalParams);
+
+    // Cache current conversation context
+    const liveChatContext = await this.chatSDK?.getCurrentLiveChatContext();
+    if (liveChatContext &&  Object.keys(liveChatContext).length) {
+      localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
+    }
 
     const chatAdapter = await this.chatSDK?.createChatAdapter();
     this.chatAdapter = chatAdapter;
