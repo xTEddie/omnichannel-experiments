@@ -68,7 +68,6 @@ export class AppComponent {
       }
 
       const chatSDK = new OmnichannelChatSDK(omnichannelConfig, chatSDKConfig);
-      console.log((chatSDK as any).chatSDKConfig);
 
       chatSDK.setDebug(!debugConfig.disable);
 
