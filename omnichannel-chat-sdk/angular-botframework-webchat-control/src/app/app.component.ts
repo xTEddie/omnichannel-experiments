@@ -1,15 +1,28 @@
 import { Component, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { environment } from './../environments/environment';
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { WebChatControlService } from './web-chat-control.service';
 import createCustomStore from './createCustomStore';
 import createAvatarMiddleware from './createAvatarMiddleware';
 import createActivityMiddleware from './createActivityMiddleware';
 import { createDataMaskingMiddleware } from './createDataMaskingMiddleware';
+import fetchDebugConfig from 'src/utils/fetchDebug.Config';
+import fetchOmnichannelConfig from 'src/utils/fetchOmnichannelConfig';
+import fetchTelemetryConfig from 'src/utils/fetchTelemetryConfig';
+
+const omnichannelConfig = fetchOmnichannelConfig();
+const telemetryConfig: any = fetchTelemetryConfig();
+const debugConfig = fetchDebugConfig();
 
 console.log(`%c [OmnichannelConfig]`, 'background-color:#001433;color:#fff');
-console.log(environment.omnichannelConfig);
+console.log(omnichannelConfig);
+
+console.log(`%c [debugConfig]`, 'background-color:#001433;color:#fff');
+console.log(debugConfig);
+
+console.log(`%c [telemetryConfig]`, 'background-color:#001433;color:#fff');
+console.log(telemetryConfig);
+
 const avatarMiddleware: any = createAvatarMiddleware();
 const activityMiddleware: any = createActivityMiddleware();
 
@@ -51,13 +64,14 @@ export class AppComponent {
       // console.log(this.webChat);
 
       const chatSDKConfig = {
-        telemetry: {
-          disable: true
-        }
+        ...telemetryConfig
       }
 
-      const chatSDK = new OmnichannelChatSDK(environment.omnichannelConfig, chatSDKConfig);
-      // chatSDK.setDebug(true);
+      const chatSDK = new OmnichannelChatSDK(omnichannelConfig, chatSDKConfig);
+      console.log((chatSDK as any).chatSDKConfig);
+
+      chatSDK.setDebug(!debugConfig.disable);
+
       await chatSDK.initialize();
 
       this.chatSDK = chatSDK;
