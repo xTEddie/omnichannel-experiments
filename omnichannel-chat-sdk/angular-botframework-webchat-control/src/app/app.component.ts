@@ -6,7 +6,7 @@ import createCustomStore from './createCustomStore';
 import createAvatarMiddleware from './createAvatarMiddleware';
 import createActivityMiddleware from './createActivityMiddleware';
 import { createDataMaskingMiddleware } from './createDataMaskingMiddleware';
-import fetchDebugConfig from 'src/utils/fetchDebug.Config';
+import fetchDebugConfig from 'src/utils/fetchDebugConfig';
 import fetchOmnichannelConfig from 'src/utils/fetchOmnichannelConfig';
 import fetchTelemetryConfig from 'src/utils/fetchTelemetryConfig';
 
