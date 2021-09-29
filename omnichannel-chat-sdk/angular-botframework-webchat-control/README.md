@@ -22,6 +22,9 @@ The sample app includes the following scenarios:
 - [X] Reconnect existing chat
 - [X] Data masking middleware
 - [ ] Attachment middleware
+- [X] Activity middleware
+- [X] Avatar middleware
+- [X] Activity status middleware
 - [ ] Escalation to Voice & Video
 
 ## Prerequisites
