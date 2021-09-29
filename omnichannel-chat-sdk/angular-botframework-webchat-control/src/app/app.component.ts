@@ -10,6 +10,7 @@ import { createDataMaskingMiddleware } from './createDataMaskingMiddleware';
 import fetchDebugConfig from 'src/utils/fetchDebugConfig';
 import fetchOmnichannelConfig from 'src/utils/fetchOmnichannelConfig';
 import fetchTelemetryConfig from 'src/utils/fetchTelemetryConfig';
+import transformLiveChatConfig, { ConfigurationManager } from 'src/utils/transformLiveChatConfig';
 
 const omnichannelConfig = fetchOmnichannelConfig();
 const telemetryConfig: any = fetchTelemetryConfig();
@@ -37,6 +38,10 @@ const styleOptions = {
   bubbleFromUserNubSize: 10,
   bubbleFromUserNubOffset: 15,
   bubbleFromUserBackground: 'rgb(246, 246, 246)'
+}
+
+const createWebChatStyleOptions = () => {
+  (styleOptions as any).hideUploadButton = !ConfigurationManager.canUploadAttachment;
 }
 
 @Component({
@@ -77,6 +82,11 @@ export class AppComponent {
 
       this.chatSDK = chatSDK;
       this.webChat = (window as any).WebChat;
+
+      const liveChatConfig = await chatSDK.getLiveChatConfig();
+      transformLiveChatConfig(liveChatConfig);
+
+      createWebChatStyleOptions();
 
       const liveChatContext = localStorage.getItem('liveChatContext');
       if (liveChatContext && Object.keys(JSON.parse(liveChatContext)).length > 0) {
