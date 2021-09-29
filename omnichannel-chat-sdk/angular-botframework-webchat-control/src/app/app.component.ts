@@ -5,6 +5,7 @@ import { WebChatControlService } from './web-chat-control.service';
 import createCustomStore from './createCustomStore';
 import createAvatarMiddleware from './createAvatarMiddleware';
 import createActivityMiddleware from './createActivityMiddleware';
+import createActivityStatusMiddleware from './createActivityStatusMiddleware';
 import { createDataMaskingMiddleware } from './createDataMaskingMiddleware';
 import fetchDebugConfig from 'src/utils/fetchDebugConfig';
 import fetchOmnichannelConfig from 'src/utils/fetchOmnichannelConfig';
@@ -25,6 +26,7 @@ console.log(telemetryConfig);
 
 const avatarMiddleware: any = createAvatarMiddleware();
 const activityMiddleware: any = createActivityMiddleware();
+const activityStatusMiddleware: any = createActivityStatusMiddleware();
 
 const styleOptions = {
   bubbleBorderRadius: 10,
@@ -127,7 +129,8 @@ export class AppComponent {
         styleOptions,
         store: this.webChatStore,
         avatarMiddleware,
-        activityMiddleware
+        activityMiddleware,
+        activityStatusMiddleware
       },
       this.document.getElementById('chat-container')
     );
