@@ -2,6 +2,8 @@
 
 ## Prerequisites
 
+1. [Android](https://www.android.com/)
+1. [iOS](https://developer.apple.com/ios/)
 1. [Cordova](https://cordova.apache.org/#getstarted)
 1. [angular-botframework-webchat-control](../angular-botframework-webchat-control/)
 
@@ -39,4 +41,10 @@ rm -rf www/
 ```
 mkdir www
 cp -r ../angular-botframework-webchat-control/dist/angular-botframework-webchat-control www/
+```
+
+### 7. Run app
+
+```
+cordova emulate android
 ```
