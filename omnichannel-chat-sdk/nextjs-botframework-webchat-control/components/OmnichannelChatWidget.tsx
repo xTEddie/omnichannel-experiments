@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import {OmnichannelChatSDK} from "@microsoft/omnichannel-chat-sdk";
 import fetchOmnichannelConfig from "../utils/fetchOmnichannelConfig";
 import fetchDebugConfig from "../utils/fetchDebugConfig";
+import ReactWebChat from "botframework-webchat";
 
 const omnichannelConfig = fetchOmnichannelConfig();
 const debugConfig = fetchDebugConfig();
@@ -14,6 +15,7 @@ console.log(debugConfig);
 
 const OmnichannelChatWidget = () => {
   const [chatSDK, setChatSDK] = useState<any>();
+  const [chatAdapter, setChatAdapter] = useState(undefined);
 
   useEffect(() => {
     console.log("[OmnichannelChatWidget]");
@@ -38,11 +40,24 @@ const OmnichannelChatWidget = () => {
       console.log(`[onNewMessage]`);
       console.log(message);
     });
+
+    const chatAdapter = await chatSDK.createChatAdapter();
+    setChatAdapter(chatAdapter);
   }, [chatSDK]);
+
+  const endChat = useCallback(async () => {
+    await chatSDK.endChat();
+
+    await (chatAdapter as any)?.end();
+
+    setChatAdapter(undefined);
+  }, [chatSDK, chatAdapter]);
 
   return (
     <div>
       <button onClick={startChat}> Start Chat </button>
+      <button onClick={endChat}> End Chat </button>
+      {chatAdapter && <ReactWebChat directLine={chatAdapter} userID="teamsvisitor" />}
     </div>
   )
 }
