@@ -1,7 +1,12 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import styles from '../styles/Home.module.css'
+
+const DynamicOmnichannelChatWidget = dynamic(() => import("../components/OmnichannelChatWidget").then((mod: any) => mod.default), {
+  ssr: false
+});
 
 const Home: NextPage = () => {
   return (
@@ -52,6 +57,8 @@ const Home: NextPage = () => {
           </a>
         </div>
       </main>
+
+      <DynamicOmnichannelChatWidget/>
 
       <footer className={styles.footer}>
         <a
