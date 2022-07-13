@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@microsoft/omnichannel-chat-sdk": "^1.1.1-main.211b61c",
+    "botframework-webchat": "^4.15.2",
     "next": "12.2.2",
     "react": "18.2.0",
     "react-dom": "18.2.0"
