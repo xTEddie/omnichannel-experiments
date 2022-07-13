@@ -22,7 +22,7 @@
       "dom"
     ],
     "paths": {
-      "path": [
+      "crypto": [
         "./node_modules/crypto-browserify"
       ]
     }
