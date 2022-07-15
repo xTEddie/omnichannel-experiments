@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import {OmnichannelChatSDK} from "@microsoft/omnichannel-chat-sdk";
+// import {OmnichannelChatSDK} from "@microsoft/omnichannel-chat-sdk";
 import fetchOmnichannelConfig from "../utils/fetchOmnichannelConfig";
 import fetchDebugConfig from "../utils/fetchDebugConfig";
 import ReactWebChat from "botframework-webchat";
+import dynamic from "next/dynamic";
 
 const omnichannelConfig = fetchOmnichannelConfig();
 const debugConfig = fetchDebugConfig();
@@ -18,8 +19,14 @@ const OmnichannelChatWidget = () => {
   const [chatAdapter, setChatAdapter] = useState(undefined);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     console.log("[OmnichannelChatWidget]");
+
     const init = async () => {
+      const OmnichannelChatSDK = (await import("@microsoft/omnichannel-chat-sdk")).OmnichannelChatSDK;
       const chatSDK = new OmnichannelChatSDK(omnichannelConfig);
       chatSDK.setDebug(!debugConfig.disable);
 

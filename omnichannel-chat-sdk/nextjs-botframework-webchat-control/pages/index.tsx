@@ -4,7 +4,8 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import styles from '../styles/Home.module.css'
 
-const DynamicOmnichannelChatWidget = dynamic(() => import("../components/OmnichannelChatWidget").then((mod: any) => mod.default), {
+const DynamicOmnichannelChatWidget = dynamic(() => import("../components/OmnichannelChatWidget"), {
+  loading: () => <p>Loading...</p>,
   ssr: false
 });
 
