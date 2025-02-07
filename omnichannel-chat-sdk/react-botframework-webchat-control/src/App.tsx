@@ -1,33 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useCallback, useEffect, useState } from 'react'
+import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
+
+  useEffect(() => {
+    const omnichannelConfig = {
+      orgId: '',
+      orgUrl: '',
+      widgetId: ''
+    };
+
+    const init = async () => {
+      const chatSDK = new OmnichannelChatSDK(omnichannelConfig);
+      await chatSDK.initialize();
+
+      setChatSDK(chatSDK);
+
+      const chatConfig = await chatSDK.getLiveChatConfig();
+      console.log(chatConfig);
+    }
+
+    init();
+  }, []);
+
+  const startChat = useCallback(async () => {
+    await chatSDK?.startChat();
+    await chatSDK?.onNewMessage((message: any) => {
+      console.log(`New message!`)
+      console.log(message?.content);
+    });
+  }, [chatSDK]);
+
+  const endChat = useCallback(async () => {
+    await chatSDK?.endChat();
+  }, [chatSDK]);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+      <h1>omnichannel-chat-sdk</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={startChat}>
+          Start Chat
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <button onClick={endChat}>
+          End Chat
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
