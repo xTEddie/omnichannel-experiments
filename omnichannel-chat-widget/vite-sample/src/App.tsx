@@ -1,33 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
+import { ILiveChatWidgetProps } from "@microsoft/omnichannel-chat-widget/lib/types/components/livechatwidget/interfaces/ILiveChatWidgetProps";//
+import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
+import { LiveChatWidget } from '@microsoft/omnichannel-chat-widget';
+import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [liveChatWidgetProps, setLiveChatWidgetProps] = useState<ILiveChatWidgetProps>();
 
+  useEffect(() => {
+    const omnichannelChatConfig = fetchOmnichannelConfig();
+    console.log(omnichannelChatConfig);
+
+    const init = async () => {
+      const chatSDK = new OmnichannelChatSDK(omnichannelChatConfig);
+      const chatConfig = await chatSDK.initialize();
+      const liveChatWidgetProps = {
+        styleProps: {
+          generalStyles: {
+            bottom: "20px",
+            right: "20px",
+            width: "360px",
+            height: "560px"
+          }
+        },
+        headerProps: {
+          styleProps: {
+            generalStyleProps: {
+              height: "70px"
+            }
+          }
+        },
+        chatSDK,
+        chatConfig
+      };
+      setLiveChatWidgetProps(liveChatWidgetProps);
+    };
+
+    init();
+  }, []);
   return (
     <>
+      <h1>Vite + Omnichannel Chat Widget</h1>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {liveChatWidgetProps && <LiveChatWidget {...liveChatWidgetProps} />}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
