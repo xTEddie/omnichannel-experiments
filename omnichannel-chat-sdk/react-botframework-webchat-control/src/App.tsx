@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { version } from '@microsoft/omnichannel-chat-sdk/package.json';
+import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
 import './App.css';
@@ -11,11 +12,16 @@ function App() {
   useEffect(() => {
     console.log(`omnichannel-chat-sdk@${version}`);
     const omnichannelConfig = fetchOmnichannelConfig();
+    const debugConfig = fetchDebugConfig();
     const chatSDKConfig = fetchChatSDKConfig();
 
     const init = async () => {
       const chatSDK = new OmnichannelChatSDK(omnichannelConfig, chatSDKConfig);
       await chatSDK.initialize();
+
+      if (debugConfig.debug) {
+        chatSDK.setDebug(true);
+      }
 
       setChatSDK(chatSDK);
 
