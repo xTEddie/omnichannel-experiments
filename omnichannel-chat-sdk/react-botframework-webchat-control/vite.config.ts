@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@microsoft/botframework-webchat-adapter-azure-communication-chat/package.json': path.resolve(__dirname, 'node_modules', '@microsoft', 'botframework-webchat-adapter-azure-communication-chat', 'package.json'),
+      'botframework-webchat/package.json': path.resolve(__dirname, 'node_modules', 'botframework-webchat', 'package.json'),
       '@microsoft/botframework-webchat-adapter-azure-communication-chat': path.resolve(__dirname, 'node_modules', '@microsoft', 'botframework-webchat-adapter-azure-communication-chat', 'dist', 'chat-adapter.js'),
     }
   }
