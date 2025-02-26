@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@microsoft/omnichannel-chat-sdk": "^1.10.6",
+    "@microsoft/omnichannel-chat-sdk": "^1.10.12",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      'acs_webchat-chat-adapter': path.resolve(__dirname, 'node_modules', 'acs_webchat-chat-adapter', 'dist', 'chat-adapter.js')
+      '@microsoft/botframework-webchat-adapter-azure-communication-chat/package.json': path.resolve(__dirname, 'node_modules', '@microsoft', 'botframework-webchat-adapter-azure-communication-chat', 'package.json'),
+      '@microsoft/botframework-webchat-adapter-azure-communication-chat': path.resolve(__dirname, 'node_modules', '@microsoft', 'botframework-webchat-adapter-azure-communication-chat', 'dist', 'chat-adapter.js'),
     }
   }
 })
