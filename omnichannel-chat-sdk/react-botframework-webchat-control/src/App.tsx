@@ -7,11 +7,13 @@ import { version as chatAdapterVersion } from '@microsoft/botframework-webchat-a
 import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
+import ChatHeader from './components/ChatHeader/ChatHeader';
 import './App.css';
 
 function App() {
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
+  const [hasChatStarted, setHasChatStarted] = useState(false);
 
   useEffect(() => {
     console.log(`omnichannel-chat-sdk@${chatSDKversion}`);
@@ -39,7 +41,12 @@ function App() {
   }, []);
 
   const startChat = useCallback(async () => {
+    if (hasChatStarted) {
+      return;
+    }
+
     await chatSDK?.startChat();
+    setHasChatStarted(true);
     console.log("Chat started!");
     await chatSDK?.onNewMessage((message: any) => {
       console.log(`New message!`)
@@ -48,11 +55,16 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK]);
+  }, [chatSDK, hasChatStarted]);
 
   const endChat = useCallback(async () => {
+    if (!hasChatStarted) {
+      return;
+    }
+
     await chatSDK?.endChat();
-  }, [chatSDK]);
+    setHasChatStarted(false);
+  }, [chatSDK, hasChatStarted]);
 
   return (
     <>
@@ -65,11 +77,13 @@ function App() {
           End Chat
         </button>
       </div>
-      <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350}}>
-        {chatAdapter && <ReactWebChat
-          directLine={chatAdapter}
-        />}
-      </div>
+      { hasChatStarted && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
+          <ChatHeader onClose={endChat}/>
+          {chatAdapter && <ReactWebChat
+            directLine={chatAdapter}
+          />}
+        </div>
+    }
     </>
   )
 }
