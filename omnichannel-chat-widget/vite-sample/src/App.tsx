@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ILiveChatWidgetProps } from "@microsoft/omnichannel-chat-widget/lib/types/components/livechatwidget/interfaces/ILiveChatWidgetProps";//
+import { ILiveChatWidgetProps } from '@microsoft/omnichannel-chat-widget/lib/types/components/livechatwidget/interfaces/ILiveChatWidgetProps';
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { LiveChatWidget } from '@microsoft/omnichannel-chat-widget';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
@@ -29,6 +29,11 @@ function App() {
             generalStyleProps: {
               height: "70px"
             }
+          }
+        },
+        webChatContainerProps: {
+          webChatStyles: {
+            hideUploadButton: false
           }
         },
         chatSDK,
