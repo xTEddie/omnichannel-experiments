@@ -1,5 +1,9 @@
-const fetchChatSDKConfig = () => {
-  const chatSDKConfig = {
+interface FetchChatSDKConfigOptions {
+  authToken?: string;
+};
+
+const fetchChatSDKConfig = (options: FetchChatSDKConfigOptions = {}) => {
+  const chatSDKConfig: any = {
     chatReconnect: {
       disable: false
     },
@@ -8,6 +12,10 @@ const fetchChatSDKConfig = () => {
       tokenUpdateTime: 21600000
     }
   };
+
+  if (options.authToken) {
+    chatSDKConfig.getAuthToken = () => options.authToken;
+  }
 
   return chatSDKConfig;
 };
