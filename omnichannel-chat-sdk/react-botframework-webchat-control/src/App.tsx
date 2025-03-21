@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import ReactWebChat from 'botframework-webchat';
 import { version as chatSDKversion } from '@microsoft/omnichannel-chat-sdk/package.json';
+import { version as OCSDKVersion } from '@microsoft/ocsdk/package.json';
 import { version as webChatVersion } from 'botframework-webchat/package.json';
 import { version as chatAdapterVersion } from '@microsoft/botframework-webchat-adapter-azure-communication-chat/package.json';
 import fetchDebugConfig from './utils/fetchDebugConfig';
@@ -16,6 +17,7 @@ function App() {
   const [hasChatStarted, setHasChatStarted] = useState(false);
 
   useEffect(() => {
+    console.log(`ocsdk@${OCSDKVersion}`);
     console.log(`omnichannel-chat-sdk@${chatSDKversion}`);
     console.log(`botframework-webchat@${webChatVersion}`);
     console.log(`botframework-webchat-adapter-azure-communication-chat@${chatAdapterVersion}`)
