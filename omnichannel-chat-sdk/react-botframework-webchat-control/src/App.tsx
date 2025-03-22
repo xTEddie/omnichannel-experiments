@@ -54,8 +54,8 @@ function App() {
     setHasChatStarted(true);
     console.log("Chat started!");
     await chatSDK?.onNewMessage((message: any) => {
-      AppConfig.onNewMessage.log && console.log(`New message!`);
-      AppConfig.onNewMessage.log && console.log(message?.content);
+      AppConfig.ChatSDK.onNewMessage.log && console.log(`New message!`);
+      AppConfig.ChatSDK.onNewMessage.log && console.log(message?.content);
     });
 
     const chatAdapter = await chatSDK?.createChatAdapter();

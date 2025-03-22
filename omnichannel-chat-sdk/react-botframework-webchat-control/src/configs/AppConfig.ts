@@ -1,6 +1,8 @@
 const AppConfig = {
-  onNewMessage: {
-    log: true
+  ChatSDK: {
+    onNewMessage: {
+      log: false
+    },
   },
   activityMiddleware: {
     disabled: true,
