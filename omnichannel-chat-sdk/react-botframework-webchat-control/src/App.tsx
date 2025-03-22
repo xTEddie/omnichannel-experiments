@@ -12,6 +12,12 @@ import fetchAuthToken from './utils/fetchAuthToken';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import './App.css';
 
+const AppConfig = {
+  onNewMessage: {
+    log: true
+  }
+};
+
 function App() {
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
@@ -53,8 +59,8 @@ function App() {
     setHasChatStarted(true);
     console.log("Chat started!");
     await chatSDK?.onNewMessage((message: any) => {
-      console.log(`New message!`)
-      console.log(message?.content);
+      AppConfig.onNewMessage.log && console.log(`New message!`);
+      AppConfig.onNewMessage.log && console.log(message?.content);
     });
 
     const chatAdapter = await chatSDK?.createChatAdapter();
@@ -87,7 +93,7 @@ function App() {
             directLine={chatAdapter}
           />}
         </div>
-    }
+      }
     </>
   )
 }
