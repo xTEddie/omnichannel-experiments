@@ -5,7 +5,7 @@ const AppConfig = {
     },
   },
   activityMiddleware: {
-    disabled: true,
+    disabled: false,
     log: true
   }
 };
