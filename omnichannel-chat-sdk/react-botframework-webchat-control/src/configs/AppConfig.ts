@@ -1,5 +1,8 @@
 const AppConfig = {
   ChatSDK: {
+    authToken: {
+      log: true
+    },
     liveChatConfig: {
       log: false // Log the live chat configuration on init
     },

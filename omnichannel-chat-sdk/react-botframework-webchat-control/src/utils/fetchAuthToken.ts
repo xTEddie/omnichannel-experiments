@@ -1,21 +1,25 @@
+import AppConfig from "../configs/AppConfig";
+
 interface FetchAuthTokenOptions {
     option: 'none' | 'local' | 'api'
 };
 
 const fetchAuthToken = async (options: FetchAuthTokenOptions) => {
+    let authToken = '';
     if (options.option === 'none') {
         return '';
     }
 
     if (options.option === 'local') {
-        return import.meta.env.VITE_AUTH_TOKEN || '';
+        authToken = import.meta.env.VITE_AUTH_TOKEN || '';
     }
 
     if (options.option === 'api') {
-        // const authToken = await fetchAuthTokenViaApi();
-        const authToken = '';
-        return authToken;
+        // authToken = await fetchAuthTokenViaApi();
     }
+
+    AppConfig.ChatSDK.authToken.log && console.log(`[fetchAuthToken]`);
+    AppConfig.ChatSDK.authToken.log && console.log(authToken);
 };
 
 export default fetchAuthToken;
