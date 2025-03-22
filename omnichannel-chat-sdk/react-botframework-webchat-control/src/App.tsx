@@ -15,6 +15,10 @@ import './App.css';
 const AppConfig = {
   onNewMessage: {
     log: true
+  },
+  activityMiddleware: {
+    disabled: true,
+    log: true
   }
 };
 
@@ -76,6 +80,23 @@ function App() {
     setHasChatStarted(false);
   }, [chatSDK, hasChatStarted]);
 
+  const activityMiddleware = () => (next: CallableFunction) => (...args: any) => {
+    AppConfig.activityMiddleware.log && console.log(`[activityMiddleware]`);
+    const [card] = args;
+    if (card.activity) {
+      AppConfig.activityMiddleware.log && console.log(card.activity);
+    }
+    return next(card);
+  };
+
+  const createActivityMiddleware = (AppConfig: any) => {
+    if (AppConfig.activityMiddleware.disabled) {
+      return;
+    }
+
+    return activityMiddleware;
+  };
+
   return (
     <>
       <h1>omnichannel-chat-sdk</h1>
@@ -91,6 +112,7 @@ function App() {
           <ChatHeader onClose={endChat}/>
           {chatAdapter && <ReactWebChat
             directLine={chatAdapter}
+            activityMiddleware={createActivityMiddleware(AppConfig)}
           />}
         </div>
       }
