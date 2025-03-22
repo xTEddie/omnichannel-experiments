@@ -8,6 +8,7 @@ import { version as chatAdapterVersion } from '@microsoft/botframework-webchat-a
 import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
+import fetchAuthToken from './utils/fetchAuthToken';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import './App.css';
 
@@ -21,11 +22,12 @@ function App() {
     console.log(`omnichannel-chat-sdk@${chatSDKversion}`);
     console.log(`botframework-webchat@${webChatVersion}`);
     console.log(`botframework-webchat-adapter-azure-communication-chat@${chatAdapterVersion}`)
-    const omnichannelConfig = fetchOmnichannelConfig();
-    const debugConfig = fetchDebugConfig();
-    const chatSDKConfig = fetchChatSDKConfig();
 
     const init = async () => {
+      const omnichannelConfig = fetchOmnichannelConfig();
+      const debugConfig = fetchDebugConfig();
+      const authToken = await fetchAuthToken({option: 'none'});
+      const chatSDKConfig = fetchChatSDKConfig({ authToken });
       const chatSDK = new OmnichannelChatSDK(omnichannelConfig, chatSDKConfig);
       await chatSDK.initialize();
 
