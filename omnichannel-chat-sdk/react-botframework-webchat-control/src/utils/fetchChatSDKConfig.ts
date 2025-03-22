@@ -14,6 +14,7 @@ const fetchChatSDKConfig = (options: FetchChatSDKConfigOptions = {}) => {
   };
 
   if (options.authToken) {
+    // ChatSDK uses the authToken only if the chat configuration is set to auth chat. Otherwise, it will ignore it.
     chatSDKConfig.getAuthToken = () => options.authToken;
   }
 
