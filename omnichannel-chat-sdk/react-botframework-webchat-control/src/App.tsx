@@ -28,7 +28,7 @@ function App() {
     const init = async () => {
       const omnichannelConfig = fetchOmnichannelConfig();
       const debugConfig = fetchDebugConfig();
-      const authToken = await fetchAuthToken({option: 'none'});
+      const authToken = await fetchAuthToken({option: 'api'});
       const chatSDKConfig = fetchChatSDKConfig({ authToken });
       const chatSDK = new OmnichannelChatSDK(omnichannelConfig, chatSDKConfig);
       await chatSDK.initialize();
@@ -51,7 +51,26 @@ function App() {
       return;
     }
 
-    await chatSDK?.startChat();
+    if (AppConfig.ChatSDK.liveChatContext.reset) {
+      localStorage.removeItem('liveChatContext');
+    }
+
+    const optionalParams: any = {};
+    if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
+      const cachedLiveChatContext = localStorage.getItem('liveChatContext');
+      if (cachedLiveChatContext && Object.keys(JSON.parse(cachedLiveChatContext)).length > 0) {
+        AppConfig.ChatSDK.liveChatContext && console.log("[liveChatContext]");
+        optionalParams.liveChatContext = JSON.parse(cachedLiveChatContext);
+      }
+    }
+
+    await chatSDK?.startChat(optionalParams);
+
+    if (AppConfig.ChatSDK.liveChatContext.cache) {
+      const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
+      localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
+    }
+
     setHasChatStarted(true);
     console.log("Chat started!");
     await chatSDK?.onNewMessage((message: any) => {
@@ -69,6 +88,11 @@ function App() {
     }
 
     await chatSDK?.endChat();
+
+    if (AppConfig.ChatSDK.liveChatContext.cache) {
+      localStorage.removeItem('liveChatContext');
+    }
+
     setHasChatStarted(false);
   }, [chatSDK, hasChatStarted]);
 
