@@ -4,7 +4,16 @@ const activityMiddleware = () => (next: CallableFunction) => (...args: any) => {
   AppConfig.activityMiddleware.log && console.log(`[activityMiddleware]`);
   const [card] = args;
   if (card.activity) {
-    AppConfig.activityMiddleware.log && console.log(card.activity);
+    const { activity } = card;
+    AppConfig.activityMiddleware.log && console.log(activity);
+
+    // Thread event activity raised by adapter
+    if (activity.channelData?.type === "Thread") {
+      const tag = 'left';
+      if (activity.text.endsWith(`${tag} chat\"`)) {
+        return next();
+      }
+    }
   }
   return next(card);
 };
