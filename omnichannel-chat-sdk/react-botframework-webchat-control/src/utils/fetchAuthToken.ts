@@ -1,5 +1,5 @@
 interface FetchAuthTokenOptions {
-    option: 'none' | 'local' 
+    option: 'none' | 'local' | 'api'
 };
 
 const fetchAuthToken = async (options: FetchAuthTokenOptions) => {
@@ -9,6 +9,12 @@ const fetchAuthToken = async (options: FetchAuthTokenOptions) => {
 
     if (options.option === 'local') {
         return import.meta.env.VITE_AUTH_TOKEN || '';
+    }
+
+    if (options.option === 'api') {
+        // const authToken = await fetchAuthTokenViaApi();
+        const authToken = '';
+        return authToken;
     }
 };
 
