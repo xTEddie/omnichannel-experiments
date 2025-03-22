@@ -40,7 +40,9 @@ function App() {
       setChatSDK(chatSDK);
 
       const chatConfig = await chatSDK.getLiveChatConfig();
-      console.log(chatConfig);
+      if (AppConfig.ChatSDK.liveChatConfig.log) {
+        console.log(chatConfig);
+      }
     }
 
     init();
