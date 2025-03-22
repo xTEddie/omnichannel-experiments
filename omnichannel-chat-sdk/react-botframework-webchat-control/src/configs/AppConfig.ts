@@ -12,7 +12,7 @@ const AppConfig = {
   },
   activityMiddleware: {
     disabled: false,
-    log: true
+    log: false // Log activity middleware events
   }
 };
 
