@@ -5,22 +5,13 @@ import { version as chatSDKversion } from '@microsoft/omnichannel-chat-sdk/packa
 import { version as OCSDKVersion } from '@microsoft/ocsdk/package.json';
 import { version as webChatVersion } from 'botframework-webchat/package.json';
 import { version as chatAdapterVersion } from '@microsoft/botframework-webchat-adapter-azure-communication-chat/package.json';
+import AppConfig from './configs/AppConfig';
 import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
 import fetchAuthToken from './utils/fetchAuthToken';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import './App.css';
-
-const AppConfig = {
-  onNewMessage: {
-    log: true
-  },
-  activityMiddleware: {
-    disabled: true,
-    log: true
-  }
-};
 
 function App() {
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
