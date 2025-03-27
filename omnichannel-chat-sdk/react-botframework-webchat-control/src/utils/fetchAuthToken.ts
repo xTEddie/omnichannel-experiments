@@ -20,6 +20,8 @@ const fetchAuthToken = async (options: FetchAuthTokenOptions) => {
 
     AppConfig.ChatSDK.authToken.log && console.log(`[fetchAuthToken]`);
     AppConfig.ChatSDK.authToken.log && console.log(authToken);
+
+    return authToken;
 };
 
 export default fetchAuthToken;
