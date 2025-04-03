@@ -43,6 +43,10 @@ function App() {
       if (AppConfig.ChatSDK.liveChatConfig.log) {
         console.log(chatConfig);
       }
+
+      if (AppConfig.ChatSDK.liveChatContext.reset) {
+        localStorage.removeItem('liveChatContext');
+      }
     }
 
     init();
@@ -51,10 +55,6 @@ function App() {
   const startChat = useCallback(async () => {
     if (hasChatStarted) {
       return;
-    }
-
-    if (AppConfig.ChatSDK.liveChatContext.reset) {
-      localStorage.removeItem('liveChatContext');
     }
 
     const optionalParams: any = {};
@@ -121,4 +121,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
