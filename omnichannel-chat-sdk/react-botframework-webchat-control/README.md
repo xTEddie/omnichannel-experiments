@@ -1,50 +1,45 @@
-# React + TypeScript + Vite
+# Vite Sample
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sample react app using [omnichannel-chat-sdk](https://github.com/microsoft/omnichannel-chat-sdk) and [vite](https://vite.dev)
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. Configure a chat widget
 
-## Expanding the ESLint configuration
+If you haven't set up a chat widget yet. Please follow these instructions on:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+https://docs.microsoft.com/en-us/dynamics365/omnichannel/administrator/add-chat-widget
 
-- Configure the top-level `parserOptions` property like this:
+### 2. **Copy** the widget snippet code from the **Code snippet** section and save it somewhere. It will be needed later on.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+It should look similar to this:
+
+```html
+<script
+    id="Microsoft_Omnichannel_LCWidget"
+    src="[your-src]"
+    data-app-id="[your-app-id]"
+    data-org-id="[your-org-id]"
+    data-org-url="[your-org-url]"
+>
+</script>
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 3. **Copy** of [.env.config](.env.config) to [.env](.env)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
 ```
+cp .env.config .env
+```
+
+Notice [.env](.env) is in [.gitignore](.gitignore)
+
+### 4. **Add** your chat widget config to [.env](.env)
+
+```
+# Chat Widget Config
+VITE_ORG_ID='[your-org-id]'
+VITE_ORG_URL='[your-org-url]'
+VITE_WIDGET_ID='[your-app-id]'
+```
+
+### 4. Install the project with `npm ci` and run the application with `npm run start`
