@@ -11,6 +11,10 @@ const activityMiddleware = () => (next: CallableFunction) => (...args: any) => {
       AppConfig.activityMiddleware.log && AppConfig.activityMiddleware.messages.system.log && console.log(`[activityMiddleware][Message][System] ${card.activity.text}`);
     }
 
+    if (activity.from?.role === 'bot') {
+      AppConfig.activityMiddleware.log && AppConfig.activityMiddleware.messages.bot.log && console.log(`[activityMiddleware][Message][Agent] ${card.activity.text}`);
+    }
+
     // Thread event activity raised by adapter
     if (activity.channelData?.type === "Thread") {
       const tag = 'left';
