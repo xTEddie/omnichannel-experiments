@@ -18,7 +18,12 @@ const AppConfig = {
   },
   activityMiddleware: {
     disabled: false,
-    log: false // Log activity middleware events
+    log: false, // Log activity middleware events
+    messages: {
+      system: {
+        log: false // Log system messages
+      }
+    }
   }
 };
 
