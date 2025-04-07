@@ -18,10 +18,13 @@ const AppConfig = {
   },
   activityMiddleware: {
     disabled: false,
-    log: false, // Log activity middleware events
+    log: true, // Log activity middleware events
     messages: {
       system: {
         log: false // Log system messages
+      },
+      bot: {
+        log: false // Log WebChat 'bot' role messages (Any incoming OC messages)
       }
     }
   }
