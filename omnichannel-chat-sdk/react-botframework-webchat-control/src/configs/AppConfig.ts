@@ -25,6 +25,9 @@ const AppConfig = {
       },
       bot: {
         log: false // Log WebChat 'bot' role messages (Any incoming OC messages)
+      },
+      user: {
+        log: false // Log WebChat 'user' role messages (Any outgoing messages)
       }
     }
   }
