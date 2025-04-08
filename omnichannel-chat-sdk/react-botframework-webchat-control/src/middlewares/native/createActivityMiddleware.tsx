@@ -12,7 +12,11 @@ const activityMiddleware = () => (next: CallableFunction) => (...args: any) => {
     }
 
     if (activity.from?.role === 'bot') {
-      AppConfig.activityMiddleware.log && AppConfig.activityMiddleware.messages.bot.log && console.log(`[activityMiddleware][Message][Agent] ${card.activity.text}`);
+      AppConfig.activityMiddleware.log && AppConfig.activityMiddleware.messages.bot.log && console.log(`[activityMiddleware][Message][AgentOrBot] ${card.activity.text}`);
+    }
+
+    if (activity.from?.role === 'user') {
+      AppConfig.activityMiddleware.log && AppConfig.activityMiddleware.messages.user.log && console.log(`[activityMiddleware][Message][Customer] ${card.activity.text}`);
     }
 
     // Thread event activity raised by adapter
