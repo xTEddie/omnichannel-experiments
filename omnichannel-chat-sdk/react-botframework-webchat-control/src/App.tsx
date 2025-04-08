@@ -10,6 +10,7 @@ import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
 import fetchAuthToken from './utils/fetchAuthToken';
+import ChatButton from './components/ChatButton/ChatButton';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
 import './App.css';
@@ -117,6 +118,9 @@ function App() {
             />
           }
         </div>
+      }
+      { !hasChatStarted && AppConfig.widget.chatButton.disabled === false &&
+        <ChatButton handleClick={startChat}/>
       }
     </>
   )
