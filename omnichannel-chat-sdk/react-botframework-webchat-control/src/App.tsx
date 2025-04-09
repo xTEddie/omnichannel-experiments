@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import ReactWebChat from 'botframework-webchat';
-import { version as chatSDKversion } from '@microsoft/omnichannel-chat-sdk/package.json';
-import { version as OCSDKVersion } from '@microsoft/ocsdk/package.json';
-import { version as webChatVersion } from 'botframework-webchat/package.json';
-import { version as chatAdapterVersion } from '@microsoft/botframework-webchat-adapter-azure-communication-chat/package.json';
 import AppConfig from './configs/AppConfig';
+import AppDetails from './components/AppDetails/AppDetails';
 import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
@@ -22,11 +19,6 @@ function App() {
   const [hasChatStarted, setHasChatStarted] = useState(false);
 
   useEffect(() => {
-    console.log(`ocsdk@${OCSDKVersion}`);
-    console.log(`omnichannel-chat-sdk@${chatSDKversion}`);
-    console.log(`botframework-webchat@${webChatVersion}`);
-    console.log(`botframework-webchat-adapter-azure-communication-chat@${chatAdapterVersion}`)
-
     const init = async () => {
       const omnichannelConfig = fetchOmnichannelConfig();
       const debugConfig = fetchDebugConfig();
@@ -103,6 +95,7 @@ function App() {
   return (
     <>
       <h1>ChatSDK Sample</h1>
+      <AppDetails />
       <ChatCommands startChat={startChat} endChat={endChat} />
       { hasChatStarted && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
           <ChatHeader onClose={endChat}/>
