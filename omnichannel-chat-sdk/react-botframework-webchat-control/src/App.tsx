@@ -101,7 +101,7 @@ function App() {
 
   return (
     <>
-      <h1>omnichannel-chat-sdk</h1>
+      <h1>ChatSDK Sample</h1>
       <div className="card">
         <button onClick={startChat}>
           Start Chat
