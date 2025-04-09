@@ -102,7 +102,15 @@ function App() {
   return (
     <>
       <h1>ChatSDK Sample</h1>
-      <div className="card">
+      <div
+        className="card"
+        style={{
+          border: '1px solid rgb(209, 209, 209)',
+          borderRadius: '8px',
+          padding: '8px'
+        }}
+      >
+        <h2 style={{fontWeight: 500, margin: '10px 15px 10px'}}> Commands </h2>
         <button onClick={startChat}>
           Start Chat
         </button>
