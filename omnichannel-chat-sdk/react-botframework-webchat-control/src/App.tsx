@@ -10,6 +10,7 @@ import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
 import fetchAuthToken from './utils/fetchAuthToken';
+import ChatButton from './components/ChatButton/ChatButton';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
 import './App.css';
@@ -112,10 +113,14 @@ function App() {
       { hasChatStarted && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
           <ChatHeader onClose={endChat}/>
           {chatAdapter && <ReactWebChat
-            directLine={chatAdapter}
-            activityMiddleware={createActivityMiddleware()}
-          />}
+              directLine={chatAdapter}
+              activityMiddleware={createActivityMiddleware()}
+            />
+          }
         </div>
+      }
+      { !hasChatStarted && AppConfig.widget.chatButton.disabled === false &&
+        <ChatButton handleClick={startChat}/>
       }
     </>
   )

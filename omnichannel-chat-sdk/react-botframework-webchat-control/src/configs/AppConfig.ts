@@ -16,9 +16,25 @@ const AppConfig = {
       retrieveFromCache: true // Retrieve the live chat context from localStorage if available
     }
   },
+  widget: {
+    chatButton: {
+      disabled: false
+    }
+  },
   activityMiddleware: {
     disabled: false,
-    log: false // Log activity middleware events
+    log: false, // Log activity middleware events
+    messages: {
+      system: {
+        log: false // Log system messages
+      },
+      bot: {
+        log: false // Log WebChat 'bot' role messages (Any incoming OC messages)
+      },
+      user: {
+        log: false // Log WebChat 'user' role messages (Any outgoing messages)
+      }
+    }
   }
 };
 
