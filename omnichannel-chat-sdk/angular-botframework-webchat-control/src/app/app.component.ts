@@ -16,4 +16,13 @@ export class AppComponent {
   constructor(
     private readonly webChatControlService: WebChatControlService, @Inject(DOCUMENT) private readonly document: any
   ) {}
+
+  async ngOnInit() {
+    console.log("[ngOnInit]");
+
+    this.webChatControlService.lazyLoad().subscribe(async (_) => {
+      this.webChat = (window as any).WebChat;
+      console.log(this.webChat);
+    });
+  }
 }
