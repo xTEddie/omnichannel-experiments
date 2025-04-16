@@ -4,6 +4,7 @@ import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { LiveChatWidget } from '@microsoft/omnichannel-chat-widget';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
+import fetchAuthToken from './utils/fetchAuthToken';
 import './App.css'
 
 function App() {
@@ -14,7 +15,8 @@ function App() {
     console.log(omnichannelChatConfig);
 
     const init = async () => {
-      const chatSDKConfig = fetchChatSDKConfig({ authToken: '' });
+      const authToken = await fetchAuthToken({option: 'api'});
+      const chatSDKConfig = fetchChatSDKConfig({ authToken });
       const chatSDK = new OmnichannelChatSDK(omnichannelChatConfig, chatSDKConfig);
       const chatConfig = await chatSDK.initialize();
       const liveChatWidgetProps = {
@@ -39,7 +41,8 @@ function App() {
           }
         },
         chatSDK,
-        chatConfig
+        chatConfig,
+        getAuthToken: () => authToken
       };
       setLiveChatWidgetProps(liveChatWidgetProps);
     };
