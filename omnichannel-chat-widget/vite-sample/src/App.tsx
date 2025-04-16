@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ILiveChatWidgetProps } from '@microsoft/omnichannel-chat-widget/lib/types/components/livechatwidget/interfaces/ILiveChatWidgetProps';
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
-import { LiveChatWidget } from '@microsoft/omnichannel-chat-widget';
+import { BroadcastService, LiveChatWidget } from '@microsoft/omnichannel-chat-widget';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
 import fetchAuthToken from './utils/fetchAuthToken';
+import ChatCommands from './components/ChatCommands/ChatCommands';
 import './App.css'
 
 function App() {
@@ -49,9 +50,23 @@ function App() {
 
     init();
   }, []);
+
+  const startChat = useCallback(async () => {
+    BroadcastService.postMessage({
+      eventName: 'StartChat',
+    });
+  }, []);
+
+  const endChat = useCallback(() => {
+    BroadcastService.postMessage({
+      eventName: 'InitiateEndChat',
+    });
+  }, []);
+
   return (
     <>
       <h1>Vite + Omnichannel Chat Widget</h1>
+      <ChatCommands startChat={startChat} endChat={endChat} />
       <div>
         {liveChatWidgetProps && <LiveChatWidget {...liveChatWidgetProps} />}
       </div>
