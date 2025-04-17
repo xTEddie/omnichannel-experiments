@@ -6,8 +6,9 @@ import AppConfig from './configs/AppConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
 import fetchAuthToken from './utils/fetchAuthToken';
+import AppDetails from './components/AppDetails/AppDetails';
 import ChatCommands from './components/ChatCommands/ChatCommands';
-import './App.css'
+import './App.css';
 
 function App() {
   const [liveChatWidgetProps, setLiveChatWidgetProps] = useState<ILiveChatWidgetProps>();
@@ -70,6 +71,7 @@ function App() {
   return (
     <>
       <h1>Vite + Omnichannel Chat Widget</h1>
+      <AppDetails />
       <ChatCommands startChat={startChat} endChat={endChat} />
       <div>
         {liveChatWidgetProps && <LiveChatWidget {...liveChatWidgetProps} />}
