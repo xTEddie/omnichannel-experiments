@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ILiveChatWidgetProps } from '@microsoft/omnichannel-chat-widget/lib/types/components/livechatwidget/interfaces/ILiveChatWidgetProps';
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { BroadcastService, LiveChatWidget } from '@microsoft/omnichannel-chat-widget';
+import AppConfig from './configs/AppConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
 import fetchAuthToken from './utils/fetchAuthToken';
@@ -40,6 +41,9 @@ function App() {
           webChatStyles: {
             hideUploadButton: false
           }
+        },
+        controlProps: {
+          hideChatButton: AppConfig.ChatWidget.hideChatButton,
         },
         chatSDK,
         chatConfig,
