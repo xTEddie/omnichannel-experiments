@@ -41,8 +41,8 @@ const AppDetails = () => {
         margin: '0 0 10px 0'
       }}>
         <h2 style={{fontWeight: 500, margin: 0}}> App Details </h2>
-        {packageVersions && packageVersions.map((pkg) => (
-            <div>
+        {packageVersions && packageVersions.map((pkg, index) => (
+            <div key={index}>
               <span style={{fontWeight: 500}}>{pkg.name}</span>
               <span style={{fontWeight: 600, color: 'red'}}>@</span>
               <span style={{fontWeight: 500, color: '#646cff'}}>{pkg.version}</span>
