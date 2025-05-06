@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, Fragment } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
+import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
 import ReactWebChat from 'botframework-webchat';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
@@ -92,6 +93,7 @@ function App() {
     setHasChatStarted(false);
   }, [chatSDK, hasChatStarted]);
 
+  const WebChatThemeProvider = AppConfig.WebChat.FluentThemeProvider.disabled === false ? FluentThemeProvider: Fragment;
   return (
     <>
       <h1>ChatSDK Sample</h1>
@@ -99,10 +101,13 @@ function App() {
       <ChatCommands startChat={startChat} endChat={endChat} />
       { hasChatStarted && <div style={{paddingBottom: 50, position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
           <ChatHeader onClose={endChat}/>
-          {chatAdapter && <ReactWebChat
-              directLine={chatAdapter}
-              activityMiddleware={createActivityMiddleware()}
-            />
+          {chatAdapter &&
+            <WebChatThemeProvider>
+              <ReactWebChat
+                directLine={chatAdapter}
+                activityMiddleware={createActivityMiddleware()}
+              />
+            </WebChatThemeProvider>
           }
         </div>
       }
