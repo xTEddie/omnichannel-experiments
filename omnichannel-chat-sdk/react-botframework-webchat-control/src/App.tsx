@@ -97,7 +97,7 @@ function App() {
       <h1>ChatSDK Sample</h1>
       <AppDetails />
       <ChatCommands startChat={startChat} endChat={endChat} />
-      { hasChatStarted && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
+      { hasChatStarted && <div style={{paddingBottom: 50, position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
           <ChatHeader onClose={endChat}/>
           {chatAdapter && <ReactWebChat
               directLine={chatAdapter}
