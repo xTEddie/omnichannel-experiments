@@ -22,6 +22,9 @@ const AppConfig = {
     }
   },
   WebChat: {
+    FluentThemeProvider: {
+      disabled: false
+    },
     activityMiddleware: {
       disabled: false,
       log: false, // Log activity middleware events
