@@ -78,6 +78,10 @@ function App() {
       return;
     }
 
+    if (AppConfig.widget.loadingPane.disabled === false) {
+      setWidgetState(WidgetState.LOADING);
+    }
+
     const optionalParams: any = {};
     if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
       const cachedLiveChatContext = localStorage.getItem('liveChatContext');
@@ -126,6 +130,13 @@ function App() {
       <AppDetails />
       <WidgetConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat} />
+      {widgetState === WidgetState.LOADING && AppConfig.widget.loadingPane.disabled === false && <WidgetContainer>
+          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+          <div style={{backgroundColor: 'white', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <span> Loading </span>
+          </div>
+        </WidgetContainer>
+      }
       { widgetState === WidgetState.CHAT && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           {chatAdapter &&

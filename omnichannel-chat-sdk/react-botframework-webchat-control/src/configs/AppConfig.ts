@@ -19,6 +19,9 @@ const AppConfig = {
   widget: {
     chatButton: {
       disabled: false
+    },
+    loadingPane: {
+      disabled: false
     }
   },
   WebChat: {
