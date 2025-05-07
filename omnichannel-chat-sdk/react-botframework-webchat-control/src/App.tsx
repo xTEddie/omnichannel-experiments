@@ -14,6 +14,7 @@ import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
 import WidgetConfigurations from './components/WidgetConfigurations/WidgetConfigurations';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
+import WidgetContent from './components/WidgetContent/WidgetContent';
 import parseLowerCaseString from './utils/parseLowerCaseString';
 import './App.css';
 
@@ -149,16 +150,16 @@ function App() {
       <ChatCommands startChat={startChat} endChat={endChat} />
       {widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
-          <div style={{backgroundColor: 'white', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <WidgetContent>
             <span> Offline </span>
-          </div>
+          </WidgetContent>
         </WidgetContainer>
       }
       {widgetState === WidgetState.LOADING && AppConfig.widget.loadingPane.disabled === false && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
-          <div style={{backgroundColor: 'white', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <WidgetContent>
             <span> Loading </span>
-          </div>
+          </WidgetContent>
         </WidgetContainer>
       }
       { widgetState === WidgetState.CHAT && <WidgetContainer>
