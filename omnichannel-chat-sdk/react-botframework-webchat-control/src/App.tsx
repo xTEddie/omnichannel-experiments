@@ -117,7 +117,7 @@ function App() {
       <AppDetails />
       <ChatCommands startChat={startChat} endChat={endChat} />
       { widgetState === WidgetState.CHAT && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
-          <ChatHeader onClose={endChat}/>
+          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           {chatAdapter &&
             <WebChatThemeProvider>
               <ReactWebChat
@@ -129,7 +129,7 @@ function App() {
           }
         </div>
       }
-      { widgetState === WidgetState.READY && AppConfig.widget.chatButton.disabled === false &&
+      { (widgetState === WidgetState.READY || widgetState === WidgetState.MINIMIZED) && AppConfig.widget.chatButton.disabled === false &&
         <ChatButton handleClick={startChat}/>
       }
     </>
