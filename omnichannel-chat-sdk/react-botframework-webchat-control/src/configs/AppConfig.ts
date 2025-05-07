@@ -25,6 +25,9 @@ const AppConfig = {
     FluentThemeProvider: {
       disabled: false
     },
+    styleOptions: {
+      rootHeight: '510px'
+    },
     activityMiddleware: {
       disabled: false,
       log: false, // Log activity middleware events
