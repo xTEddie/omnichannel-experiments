@@ -76,7 +76,7 @@ function App() {
   }, [widgetState]);
 
   const startChat = useCallback(async () => {
-    if (isOutOfOperatingHours) {
+    if (isOutOfOperatingHours && AppConfig.widget.offlinePane.disabled === false) {
       setWidgetState(WidgetState.OFFLINE);
       return;
     }
@@ -122,7 +122,7 @@ function App() {
   }, [chatSDK, widgetState, isOutOfOperatingHours]);
 
   const endChat = useCallback(async () => {
-    if (widgetState === WidgetState.OFFLINE) {
+    if (widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false) {
       setWidgetState(WidgetState.MINIMIZED);
       return;
     }
@@ -147,7 +147,7 @@ function App() {
       <AppDetails />
       <WidgetConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat} />
-      {widgetState === WidgetState.OFFLINE && <WidgetContainer>
+      {widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           <div style={{backgroundColor: 'white', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <span> Offline </span>
