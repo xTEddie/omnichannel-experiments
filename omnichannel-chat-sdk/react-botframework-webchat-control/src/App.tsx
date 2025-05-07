@@ -12,6 +12,7 @@ import ChatButton from './components/ChatButton/ChatButton';
 import ChatCommands from './components/ChatCommands/ChatCommands';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
+import WidgetConfigurations from './components/WidgetConfigurations/WidgetConfigurations';
 import './App.css';
 
 enum WidgetState {
@@ -26,6 +27,7 @@ enum WidgetState {
 function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
+  const [chatConfig, setChatConfig] = useState<any>(undefined);
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
 
   useEffect(() => {
@@ -44,6 +46,7 @@ function App() {
       setChatSDK(chatSDK);
 
       const chatConfig = await chatSDK.getLiveChatConfig();
+      setChatConfig(chatConfig);
       if (AppConfig.ChatSDK.liveChatConfig.log) {
         console.log(chatConfig);
       }
@@ -115,6 +118,7 @@ function App() {
     <>
       <h1>ChatSDK Sample</h1>
       <AppDetails />
+      <WidgetConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat} />
       { widgetState === WidgetState.CHAT && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
           <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
