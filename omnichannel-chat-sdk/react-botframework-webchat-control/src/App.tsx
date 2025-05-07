@@ -73,6 +73,11 @@ function App() {
       return;
     }
 
+    if (widgetState === WidgetState.MINIMIZED) { // Resumes chat
+      setWidgetState(WidgetState.CHAT);
+      return;
+    }
+
     const optionalParams: any = {};
     if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
       const cachedLiveChatContext = localStorage.getItem('liveChatContext');
