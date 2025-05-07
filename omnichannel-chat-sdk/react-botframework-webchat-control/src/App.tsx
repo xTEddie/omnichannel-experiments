@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, Fragment } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
+import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
 import ReactWebChat from 'botframework-webchat';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
@@ -13,10 +14,19 @@ import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
 import './App.css';
 
+enum WidgetState {
+  UNKNOWN = 'UNKNOWN',
+  READY = 'READY', // Widget is ready to be used
+  LOADING = 'LOADING',
+  CHAT = 'CHAT',
+  ENDED = 'ENDED',
+  MINIMIZED = 'MINIMIZED',
+};
+
 function App() {
+  const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
-  const [hasChatStarted, setHasChatStarted] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -41,13 +51,21 @@ function App() {
       if (AppConfig.ChatSDK.liveChatContext.reset) {
         localStorage.removeItem('liveChatContext');
       }
+
+      setWidgetState(WidgetState.READY);
     }
 
     init();
   }, []);
 
+  useEffect(() => {
+    if (widgetState === WidgetState.ENDED) {
+      setWidgetState(WidgetState.READY);
+    }
+  }, [widgetState]);
+
   const startChat = useCallback(async () => {
-    if (hasChatStarted) {
+    if (widgetState === WidgetState.CHAT) {
       return;
     }
 
@@ -67,7 +85,7 @@ function App() {
       localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
     }
 
-    setHasChatStarted(true);
+    setWidgetState(WidgetState.CHAT);
     console.log("Chat started!");
     await chatSDK?.onNewMessage((message: any) => {
       AppConfig.ChatSDK.onNewMessage.log && console.log(`New message!`);
@@ -76,10 +94,10 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK, hasChatStarted]);
+  }, [chatSDK, widgetState]);
 
   const endChat = useCallback(async () => {
-    if (!hasChatStarted) {
+    if (widgetState !== WidgetState.CHAT) {
       return;
     }
 
@@ -89,24 +107,29 @@ function App() {
       localStorage.removeItem('liveChatContext');
     }
 
-    setHasChatStarted(false);
-  }, [chatSDK, hasChatStarted]);
+    setWidgetState(WidgetState.ENDED);
+  }, [chatSDK, widgetState]);
 
+  const WebChatThemeProvider = AppConfig.WebChat.FluentThemeProvider.disabled === false ? FluentThemeProvider: Fragment;
   return (
     <>
       <h1>ChatSDK Sample</h1>
       <AppDetails />
       <ChatCommands startChat={startChat} endChat={endChat} />
-      { hasChatStarted && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
-          <ChatHeader onClose={endChat}/>
-          {chatAdapter && <ReactWebChat
-              directLine={chatAdapter}
-              activityMiddleware={createActivityMiddleware()}
-            />
+      { widgetState === WidgetState.CHAT && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
+          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+          {chatAdapter &&
+            <WebChatThemeProvider>
+              <ReactWebChat
+                directLine={chatAdapter}
+                styleOptions={AppConfig.WebChat.styleOptions}
+                activityMiddleware={createActivityMiddleware()}
+              />
+            </WebChatThemeProvider>
           }
         </div>
       }
-      { !hasChatStarted && AppConfig.widget.chatButton.disabled === false &&
+      { (widgetState === WidgetState.READY || widgetState === WidgetState.MINIMIZED) && AppConfig.widget.chatButton.disabled === false &&
         <ChatButton handleClick={startChat}/>
       }
     </>

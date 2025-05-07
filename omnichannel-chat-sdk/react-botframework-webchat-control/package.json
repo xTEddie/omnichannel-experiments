@@ -12,6 +12,7 @@
   "dependencies": {
     "@microsoft/omnichannel-chat-sdk": "^1.10.17",
     "botframework-webchat": "^4.18.0",
+    "botframework-webchat-fluent-theme": "^4.18.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
