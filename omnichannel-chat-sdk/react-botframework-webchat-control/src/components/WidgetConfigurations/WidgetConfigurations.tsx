@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
+import parseLowerCaseString from "../../utils/parseLowerCaseString";
 
 interface WidgetConfigurationsProps {
   chatConfig: any;
 }
-
-const parseLowerCaseString = (property: string | boolean): string => {
-  return String(property).toLowerCase();
-};
 
 const WidgetConfigurations = (props: WidgetConfigurationsProps) => {
   const [isAuthenticatedChat, setIsAuthenticatedChat] = useState(false);
