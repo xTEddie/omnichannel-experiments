@@ -20,6 +20,9 @@ const AppConfig = {
     chatButton: {
       disabled: false
     },
+    errorPane: {
+      disabled: false
+    },
     offlinePane: {
       disabled: false
     },
