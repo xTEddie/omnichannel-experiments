@@ -21,12 +21,12 @@ import './App.css';
 enum WidgetState {
   UNKNOWN = 'UNKNOWN',
   READY = 'READY', // Widget is ready to be used
-  LOADING = 'LOADING',
-  CHAT = 'CHAT',
-  ENDED = 'ENDED',
-  MINIMIZED = 'MINIMIZED',
-  OFFLINE = 'OFFLINE',
-  ERROR = 'ERROR'
+  LOADING = 'LOADING', // Chat started but not fully completd yet
+  CHAT = 'CHAT', // Chat is in progress
+  ENDED = 'ENDED', // Chat has ended
+  MINIMIZED = 'MINIMIZED', // Chat is minimized
+  OFFLINE = 'OFFLINE', // Chat is out of business hours
+  ERROR = 'ERROR' // Chat is in error state
 };
 
 function App() {
