@@ -21,7 +21,7 @@ import './App.css';
 enum WidgetState {
   UNKNOWN = 'UNKNOWN',
   READY = 'READY', // Widget is ready to be used
-  LOADING = 'LOADING', // Chat started but not fully completd yet
+  LOADING = 'LOADING', // Chat started but not fully completed yet
   CHAT = 'CHAT', // Chat is in progress
   ENDED = 'ENDED', // Chat has ended
   MINIMIZED = 'MINIMIZED', // Chat is minimized
