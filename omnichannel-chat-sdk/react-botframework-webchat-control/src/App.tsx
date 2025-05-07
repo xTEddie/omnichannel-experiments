@@ -25,7 +25,8 @@ enum WidgetState {
   CHAT = 'CHAT',
   ENDED = 'ENDED',
   MINIMIZED = 'MINIMIZED',
-  OFFLINE = 'OFFLINE'
+  OFFLINE = 'OFFLINE',
+  ERROR = 'ERROR'
 };
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
   const [chatConfig, setChatConfig] = useState<any>(undefined);
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -77,6 +79,11 @@ function App() {
   }, [widgetState]);
 
   const startChat = useCallback(async () => {
+    if (errorMessage && AppConfig.widget.errorPane.disabled === false) {
+      setWidgetState(WidgetState.ERROR);
+      return;
+    }
+
     if (isOutOfOperatingHours && AppConfig.widget.offlinePane.disabled === false) {
       setWidgetState(WidgetState.OFFLINE);
       return;
@@ -104,7 +111,33 @@ function App() {
       }
     }
 
-    await chatSDK?.startChat(optionalParams);
+    try {
+      await chatSDK?.startChat(optionalParams);
+    } catch (error: any) {
+      if (AppConfig.widget.errorPane.disabled === false) {
+        if (error?.message === 'InvalidConversation') {
+          setErrorMessage('Conversation not found');
+        }
+
+        if (error?.message === 'ClosedConversation') {
+          setErrorMessage('Conversation has been closed');
+        }
+
+        if (error?.message === 'GetAuthTokenNotFound') {
+          setErrorMessage('GetAuthToken function not implemented');
+        }
+
+        if (error?.message === 'ChatTokenRetrievalFailure' && error?.httpResponseStatusCode === 401) {
+          setErrorMessage('Invalid auth token');
+        }
+
+        console.error(error);
+        setWidgetState(WidgetState.ERROR);
+        return;
+      }
+
+      throw error;
+    }
 
     if (AppConfig.ChatSDK.liveChatContext.cache) {
       const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
@@ -120,9 +153,15 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK, widgetState, isOutOfOperatingHours]);
+  }, [chatSDK, widgetState, errorMessage, isOutOfOperatingHours]);
 
   const endChat = useCallback(async () => {
+    if (widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false) {
+      setErrorMessage(null);
+      setWidgetState(WidgetState.READY);
+      return;
+    }
+
     if (widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false) {
       setWidgetState(WidgetState.MINIMIZED);
       return;
@@ -148,6 +187,13 @@ function App() {
       <AppDetails />
       <WidgetConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat} />
+      {widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false && <WidgetContainer>
+        <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+          <WidgetContent>
+            <span> {errorMessage || 'Error'} </span>
+          </WidgetContent>
+        </WidgetContainer>
+      }
       {widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           <WidgetContent>
