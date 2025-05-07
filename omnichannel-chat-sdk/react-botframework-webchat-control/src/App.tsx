@@ -12,6 +12,10 @@ import ChatButton from './components/ChatButton/ChatButton';
 import ChatCommands from './components/ChatCommands/ChatCommands';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
+import WidgetConfigurations from './components/WidgetConfigurations/WidgetConfigurations';
+import WidgetContainer from './components/WidgetContainer/WidgetContainer';
+import WidgetContent from './components/WidgetContent/WidgetContent';
+import parseLowerCaseString from './utils/parseLowerCaseString';
 import './App.css';
 
 enum WidgetState {
@@ -21,12 +25,15 @@ enum WidgetState {
   CHAT = 'CHAT',
   ENDED = 'ENDED',
   MINIMIZED = 'MINIMIZED',
+  OFFLINE = 'OFFLINE'
 };
 
 function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
+  const [chatConfig, setChatConfig] = useState<any>(undefined);
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
+  const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -44,6 +51,7 @@ function App() {
       setChatSDK(chatSDK);
 
       const chatConfig = await chatSDK.getLiveChatConfig();
+      setChatConfig(chatConfig);
       if (AppConfig.ChatSDK.liveChatConfig.log) {
         console.log(chatConfig);
       }
@@ -51,6 +59,10 @@ function App() {
       if (AppConfig.ChatSDK.liveChatContext.reset) {
         localStorage.removeItem('liveChatContext');
       }
+
+      const {LiveWSAndLiveChatEngJoin} = chatConfig;
+      const {OutOfOperatingHours} = LiveWSAndLiveChatEngJoin;
+      setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
 
       setWidgetState(WidgetState.READY);
     }
@@ -65,8 +77,22 @@ function App() {
   }, [widgetState]);
 
   const startChat = useCallback(async () => {
+    if (isOutOfOperatingHours && AppConfig.widget.offlinePane.disabled === false) {
+      setWidgetState(WidgetState.OFFLINE);
+      return;
+    }
+
     if (widgetState === WidgetState.CHAT) {
       return;
+    }
+
+    if (widgetState === WidgetState.MINIMIZED) { // Resumes chat
+      setWidgetState(WidgetState.CHAT);
+      return;
+    }
+
+    if (AppConfig.widget.loadingPane.disabled === false) {
+      setWidgetState(WidgetState.LOADING);
     }
 
     const optionalParams: any = {};
@@ -94,9 +120,14 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK, widgetState]);
+  }, [chatSDK, widgetState, isOutOfOperatingHours]);
 
   const endChat = useCallback(async () => {
+    if (widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false) {
+      setWidgetState(WidgetState.MINIMIZED);
+      return;
+    }
+
     if (widgetState !== WidgetState.CHAT) {
       return;
     }
@@ -115,8 +146,23 @@ function App() {
     <>
       <h1>ChatSDK Sample</h1>
       <AppDetails />
+      <WidgetConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat} />
-      { widgetState === WidgetState.CHAT && <div style={{position: 'absolute', bottom: 20, right: 20, height: 560, width: 350, border: '1px solid rgb(209, 209, 209)', display: 'flex', flexDirection: 'column'}}>
+      {widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false && <WidgetContainer>
+        <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+          <WidgetContent>
+            <span> Offline </span>
+          </WidgetContent>
+        </WidgetContainer>
+      }
+      {widgetState === WidgetState.LOADING && AppConfig.widget.loadingPane.disabled === false && <WidgetContainer>
+          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+          <WidgetContent>
+            <span> Loading </span>
+          </WidgetContent>
+        </WidgetContainer>
+      }
+      { widgetState === WidgetState.CHAT && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           {chatAdapter &&
             <WebChatThemeProvider>
@@ -127,7 +173,7 @@ function App() {
               />
             </WebChatThemeProvider>
           }
-        </div>
+        </WidgetContainer>
       }
       { (widgetState === WidgetState.READY || widgetState === WidgetState.MINIMIZED) && AppConfig.widget.chatButton.disabled === false &&
         <ChatButton handleClick={startChat}/>
