@@ -258,7 +258,7 @@ function App() {
       { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           <WidgetContent>
-            <iframe
+            {postChatSurveyContext.participantType === 'User' && <iframe
               src={postChatSurveyContext?.surveyInviteLink}
               style={{
                 height: "inherit",
@@ -266,6 +266,16 @@ function App() {
                 display: "block",
                 border: 0
               }} />
+            }
+            {postChatSurveyContext.participantType === 'Bot' && <iframe
+              src={postChatSurveyContext?.botSurveyInviteLink}
+              style={{
+                height: "inherit",
+                width: "100%",
+                display: "block",
+                border: 0
+              }} />
+            }
           </WidgetContent>
         </WidgetContainer>
       }
