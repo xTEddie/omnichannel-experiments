@@ -5,7 +5,7 @@ interface WidgetConfigurationsProps {
   chatConfig: any;
 }
 
-const WidgetConfigurations = (props: WidgetConfigurationsProps) => {
+const LiveChatConfigurations = (props: WidgetConfigurationsProps) => {
   const [isAuthenticatedChat, setIsAuthenticatedChat] = useState(false);
   const [isPersistentChat, setIsPersistentChat] = useState(false);
   const [isChatReconnect, setIsChatReconnect] = useState(false);
@@ -38,7 +38,7 @@ const WidgetConfigurations = (props: WidgetConfigurationsProps) => {
         margin: '0 0 10px 0',
       }}
     >      
-      <h2 style={{fontWeight: 500, margin: '10px 15px 10px'}}> Widget Configurations </h2>
+      <h2 style={{fontWeight: 500, margin: '10px 15px 10px'}}> Live Chat Configurations </h2>
       <div style={{textAlign: 'left', padding: '10px', display: 'flex', flexDirection: 'column'}}>
         <div>
           <span> Authenticated </span>
@@ -73,4 +73,4 @@ const WidgetConfigurations = (props: WidgetConfigurationsProps) => {
   )
 };
 
-export default WidgetConfigurations;
+export default LiveChatConfigurations;

@@ -12,7 +12,7 @@ import ChatButton from './components/ChatButton/ChatButton';
 import ChatCommands from './components/ChatCommands/ChatCommands';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
-import WidgetConfigurations from './components/WidgetConfigurations/WidgetConfigurations';
+import LiveChatConfigurations from './components/LiveChatConfigurations/LiveChatConfigurations';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
 import WidgetContent from './components/WidgetContent/WidgetContent';
 import parseLowerCaseString from './utils/parseLowerCaseString';
@@ -217,7 +217,7 @@ function App() {
     <>
       <h1>ChatSDK Sample</h1>
       <AppDetails />
-      <WidgetConfigurations chatConfig={chatConfig} />
+      <LiveChatConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat} />
       {widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
