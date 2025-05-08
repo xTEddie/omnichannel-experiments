@@ -54,6 +54,10 @@ const AppConfig = {
           log: false // Log WebChat 'user' role messages (Any outgoing messages)
         }
       }
+    },
+    attachmentMiddleware: {
+      disabled: false,
+      log: false // Log attachment middleware events
     }
   }
 };

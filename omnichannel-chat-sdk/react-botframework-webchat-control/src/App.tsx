@@ -12,6 +12,7 @@ import ChatButton from './components/ChatButton/ChatButton';
 import ChatCommands from './components/ChatCommands/ChatCommands';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
+import createAttachmentMiddleware from './middlewares/native/createAttachmentMiddleware';
 import LiveChatConfigurations from './components/LiveChatConfigurations/LiveChatConfigurations';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
 import WidgetContent from './components/WidgetContent/WidgetContent';
@@ -248,6 +249,7 @@ function App() {
                 directLine={chatAdapter}
                 styleOptions={AppConfig.WebChat.styleOptions}
                 activityMiddleware={createActivityMiddleware()}
+                attachmentMiddleware={createAttachmentMiddleware()}
               />
             </WebChatThemeProvider>
           }
