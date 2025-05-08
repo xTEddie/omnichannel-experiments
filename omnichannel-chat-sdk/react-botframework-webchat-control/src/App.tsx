@@ -24,6 +24,7 @@ enum WidgetState {
   LOADING = 'LOADING', // Chat started but not fully completed yet
   CHAT = 'CHAT', // Chat is in progress
   ENDED = 'ENDED', // Chat has ended
+  POSTCHATSURVEY = 'POSTCHATSURVEY',
   MINIMIZED = 'MINIMIZED', // Chat is minimized
   OFFLINE = 'OFFLINE', // Chat is out of business hours
   ERROR = 'ERROR' // Chat is in error state
@@ -34,7 +35,10 @@ function App() {
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
   const [chatConfig, setChatConfig] = useState<any>(undefined);
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
+  const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
+  const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
+  const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,8 +67,9 @@ function App() {
       }
 
       const {LiveWSAndLiveChatEngJoin} = chatConfig;
-      const {OutOfOperatingHours} = LiveWSAndLiveChatEngJoin;
+      const {OutOfOperatingHours, msdyn_postconversationsurveyenable} = LiveWSAndLiveChatEngJoin;
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
+      setIsPostChatSurvey(parseLowerCaseString(msdyn_postconversationsurveyenable) === 'true');
 
       setWidgetState(WidgetState.READY);
     }
@@ -74,9 +79,29 @@ function App() {
 
   useEffect(() => {
     if (widgetState === WidgetState.ENDED) {
+      if (isPostChatSurvey && AppConfig.widget.postChatSurveyPane.disabled === false) {
+        const renderPostChatSurvey = async () => {
+          const requestId = chatSDK?.requestId; // save the requestId for later use
+          (chatSDK as any).requestId = liveChatContext?.requestId;
+          (chatSDK as any).chatToken = liveChatContext?.chatToken;
+
+          const postChatSurveyContext = await chatSDK?.getPostChatSurveyContext();
+          setPostChatSurveyContext(postChatSurveyContext);
+
+          // Clean up
+          (chatSDK as any).requestId = requestId;
+          (chatSDK as any).chatToken = {};
+
+          setWidgetState(WidgetState.POSTCHATSURVEY);
+        }
+
+        renderPostChatSurvey();
+        return;
+      }
+
       setWidgetState(WidgetState.READY);
     }
-  }, [widgetState]);
+  }, [chatSDK, widgetState, isPostChatSurvey, liveChatContext]);
 
   const startChat = useCallback(async () => {
     if (errorMessage && AppConfig.widget.errorPane.disabled === false) {
@@ -138,9 +163,9 @@ function App() {
 
       throw error;
     }
-
+    const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
+    setLiveChatContext(liveChatContext);
     if (AppConfig.ChatSDK.liveChatContext.cache) {
-      const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
       localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
     }
 
@@ -164,6 +189,13 @@ function App() {
 
     if (widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false) {
       setWidgetState(WidgetState.MINIMIZED);
+      return;
+    }
+
+    if (widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false) {
+      setPostChatSurveyContext(null);
+      setLiveChatContext(null);
+      setWidgetState(WidgetState.READY);
       return;
     }
 
@@ -219,6 +251,20 @@ function App() {
               />
             </WebChatThemeProvider>
           }
+        </WidgetContainer>
+      }
+      { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
+          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+          <WidgetContent>
+            <iframe
+              src={postChatSurveyContext?.surveyInviteLink}
+              style={{
+                height: "inherit",
+                width: "100%",
+                display: "block",
+                border: 0
+              }} />
+          </WidgetContent>
         </WidgetContainer>
       }
       { (widgetState === WidgetState.READY || widgetState === WidgetState.MINIMIZED) && AppConfig.widget.chatButton.disabled === false &&
