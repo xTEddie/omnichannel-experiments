@@ -31,6 +31,11 @@ enum WidgetState {
   ERROR = 'ERROR' // Chat is in error state
 };
 
+enum PostChatSurveyMode {
+  Embed = '192350000',
+  Link = '192350001'
+};
+
 function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
@@ -39,6 +44,7 @@ function App() {
   const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
   const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
+  const [postChatSurveyMode, setPostChatSurveyMode] = useState<PostChatSurveyMode>();
   const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -68,7 +74,8 @@ function App() {
       }
 
       const {LiveWSAndLiveChatEngJoin} = chatConfig;
-      const {OutOfOperatingHours, msdyn_postconversationsurveyenable} = LiveWSAndLiveChatEngJoin;
+      const {OutOfOperatingHours, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
+      setPostChatSurveyMode(msdyn_postconversationsurveymode);
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
       setIsPostChatSurvey(parseLowerCaseString(msdyn_postconversationsurveyenable) === 'true');
 
@@ -258,7 +265,7 @@ function App() {
       { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           <WidgetContent>
-            {postChatSurveyContext.participantType === 'User' && <iframe
+            {postChatSurveyContext.participantType === 'User' && postChatSurveyMode === PostChatSurveyMode.Embed && <iframe
               src={postChatSurveyContext?.surveyInviteLink}
               style={{
                 height: "inherit",
@@ -267,8 +274,8 @@ function App() {
                 border: 0
               }} />
             }
-            {postChatSurveyContext.participantType === 'Bot' && <iframe
-              src={postChatSurveyContext?.botSurveyInviteLink}
+            {postChatSurveyContext.participantType === 'Bot' && postChatSurveyMode === PostChatSurveyMode.Embed && <iframe
+              src={postChatSurveyContext?.botSurveyInviteLink || postChatSurveyContext?.surveyInviteLink}
               style={{
                 height: "inherit",
                 width: "100%",
