@@ -28,6 +28,9 @@ const AppConfig = {
     },
     loadingPane: {
       disabled: false
+    },
+    postChatSurveyPane: {
+      disabled: false
     }
   },
   WebChat: {
