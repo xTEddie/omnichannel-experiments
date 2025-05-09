@@ -58,6 +58,10 @@ const AppConfig = {
     attachmentMiddleware: {
       disabled: false,
       log: false // Log attachment middleware events
+    },
+    cardActionMiddleware: {
+      disabled: false,
+      log: false // Log card action middleware events
     }
   }
 };
