@@ -160,7 +160,8 @@ function App() {
 
     if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false && !cachedLiveChatContext) {
       const adaptiveCard = new AdaptiveCards.AdaptiveCard();
-      const preChatSurvey = await chatSDK?.getPreChatSurvey();
+      const preChatSurveyRaw = await chatSDK?.getPreChatSurvey(false);
+      const preChatSurvey = JSON.parse(preChatSurveyRaw.replaceAll("&#42;", "*")); // HTML entities '&#42;' is not unescaped for some reason
       if (AppConfig.widget.preChatSurveyPane.log === true) {
         console.log(preChatSurvey);
       }
