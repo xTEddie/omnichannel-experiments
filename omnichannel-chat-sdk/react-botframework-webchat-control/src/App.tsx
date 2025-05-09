@@ -48,6 +48,7 @@ function App() {
   const [postChatSurveyMode, setPostChatSurveyMode] = useState<PostChatSurveyMode>();
   const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [styleOptions, setStyleOptions] = useState<any>({});
 
   useEffect(() => {
     const init = async () => {
@@ -87,6 +88,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (widgetState === WidgetState.READONLY) {
+      setStyleOptions({hideSendBox: true});
+    }
+
     if (widgetState === WidgetState.ENDED) {
       if (isPostChatSurvey && AppConfig.widget.postChatSurveyPane.disabled === false) {
         if (postChatSurveyMode === PostChatSurveyMode.Link) {
@@ -209,6 +214,7 @@ function App() {
     if (widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false) {
       setPostChatSurveyContext(null);
       setLiveChatContext(null);
+      setStyleOptions({});
       setWidgetState(WidgetState.READY);
       return;
     }
@@ -216,6 +222,7 @@ function App() {
     if (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false) {
       setPostChatSurveyContext(null);
       setLiveChatContext(null);
+      setStyleOptions({});
       setWidgetState(WidgetState.READY);
       return;
     }
@@ -267,7 +274,7 @@ function App() {
             <WebChatThemeProvider>
               <ReactWebChat
                 directLine={chatAdapter}
-                styleOptions={AppConfig.WebChat.styleOptions}
+                styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
                 activityMiddleware={createActivityMiddleware()}
                 attachmentMiddleware={createAttachmentMiddleware()}
               />
