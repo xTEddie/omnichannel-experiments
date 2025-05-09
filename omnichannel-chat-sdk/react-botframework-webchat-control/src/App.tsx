@@ -18,6 +18,7 @@ import createCardActionMiddleware from './middlewares/native/createCardActionMid
 import LiveChatConfigurations from './components/LiveChatConfigurations/LiveChatConfigurations';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
 import WidgetContent from './components/WidgetContent/WidgetContent';
+import getLiveChatContextFromCache from './utils/getLiveChatContextFromCache';
 import parseLowerCaseString from './utils/parseLowerCaseString';
 import './App.css';
 
@@ -201,10 +202,9 @@ function App() {
     }
 
     if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
-      const cachedLiveChatContext = localStorage.getItem('liveChatContext');
-      if (cachedLiveChatContext && Object.keys(JSON.parse(cachedLiveChatContext)).length > 0) {
-        AppConfig.ChatSDK.liveChatContext && console.log("[liveChatContext]");
-        optionalParams.liveChatContext = JSON.parse(cachedLiveChatContext);
+      const cachedLiveChatContext = getLiveChatContextFromCache();
+      if (cachedLiveChatContext) {
+        optionalParams.liveChatContext = cachedLiveChatContext;
       }
     }
 
