@@ -16,7 +16,15 @@ const AppConfig = {
       retrieveFromCache: true // Retrieve the live chat context from localStorage if available
     }
   },
+  components: {
+    WidgetContainer: {
+      log: true
+    }
+  },
   widget: {
+    WidgetState: {
+      log: false // Log the widget state changes
+    },
     chatButton: {
       disabled: false
     },
@@ -24,6 +32,10 @@ const AppConfig = {
       disabled: false
     },
     offlinePane: {
+      disabled: false
+    },
+    preChatSurveyPane: {
+      log: false,
       disabled: false
     },
     loadingPane: {
@@ -58,6 +70,10 @@ const AppConfig = {
     attachmentMiddleware: {
       disabled: false,
       log: false // Log attachment middleware events
+    },
+    cardActionMiddleware: {
+      disabled: false,
+      log: false // Log card action middleware events
     }
   }
 };

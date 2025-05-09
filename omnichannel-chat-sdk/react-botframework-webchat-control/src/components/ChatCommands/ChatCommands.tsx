@@ -15,6 +15,9 @@ const ChatCommands = (props: ChatCommandsProps) => {
         }}
       >
         <h2 style={{fontWeight: 500, margin: '10px 15px 10px'}}> Commands </h2>
+        <button onClick={() => {localStorage.removeItem('liveChatContext')}}>
+          Clear Cache
+        </button>
         <button onClick={props.startChat}>
           Start Chat
         </button>

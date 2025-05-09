@@ -1,3 +1,4 @@
+import * as AdaptiveCards from 'adaptivecards';
 import { useCallback, useEffect, useState, Fragment } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
@@ -13,24 +14,14 @@ import ChatCommands from './components/ChatCommands/ChatCommands';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
 import createAttachmentMiddleware from './middlewares/native/createAttachmentMiddleware';
+import createCardActionMiddleware from './middlewares/native/createCardActionMiddleware';
 import LiveChatConfigurations from './components/LiveChatConfigurations/LiveChatConfigurations';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
 import WidgetContent from './components/WidgetContent/WidgetContent';
+import WidgetState from './common/WidgetState';
+import getLiveChatContextFromCache from './utils/getLiveChatContextFromCache';
 import parseLowerCaseString from './utils/parseLowerCaseString';
 import './App.css';
-
-enum WidgetState {
-  UNKNOWN = 'UNKNOWN',
-  READY = 'READY', // Widget is ready to be used
-  LOADING = 'LOADING', // Chat started but not fully completed yet
-  CHAT = 'CHAT', // Chat is in progress
-  ENDED = 'ENDED', // Chat has ended
-  READONLY = 'READONLY', // Chat has ended but in read-only mode to display post-chat survey
-  POSTCHATSURVEY = 'POSTCHATSURVEY',
-  MINIMIZED = 'MINIMIZED', // Chat is minimized
-  OFFLINE = 'OFFLINE', // Chat is out of business hours
-  ERROR = 'ERROR' // Chat is in error state
-};
 
 enum PostChatSurveyMode {
   Embed = '192350000',
@@ -39,14 +30,18 @@ enum PostChatSurveyMode {
 
 function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
+  const [recentWidgetState, setRecentWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
   const [chatConfig, setChatConfig] = useState<any>(undefined);
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
   const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
+  const [isPreChatSurveyEnabled, setIsPreChatSurveyEnabled] = useState(false);
+  const [renderedPreChatSurveyCard, setRenderedPreChatSurveyCard] = useState<any>(undefined);
+  const [preChatResponse, setPreChatResponse] = useState<any>(undefined);
   const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
   const [postChatSurveyMode, setPostChatSurveyMode] = useState<PostChatSurveyMode>();
-  const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
+  const [embedPostChatSurvey, setEmbedPostChatSurvey] = useState<any> (undefined);;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [styleOptions, setStyleOptions] = useState<any>({});
   const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
@@ -77,7 +72,8 @@ function App() {
       }
 
       const {LiveWSAndLiveChatEngJoin} = chatConfig;
-      const {OutOfOperatingHours, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
+      const {OutOfOperatingHours, msdyn_prechatenabled, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
+      setIsPreChatSurveyEnabled(parseLowerCaseString(msdyn_prechatenabled) === 'true');
       setPostChatSurveyMode(msdyn_postconversationsurveymode);
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
       setIsPostChatSurvey(parseLowerCaseString(msdyn_postconversationsurveyenable) === 'true');
@@ -89,6 +85,15 @@ function App() {
   }, []);
 
   useEffect(() => {
+    AppConfig.widget.WidgetState.log && console.log(widgetState);
+  }, [widgetState]);
+
+  useEffect(() => {
+    if (widgetState === WidgetState.PRECHATSURVEYSUBMITTED && AppConfig.widget.preChatSurveyPane.disabled === false) {
+      startChat(); // Starts chat once pre-chat survey is submitted
+      return;
+    }
+
     if (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false) {
       setStyleOptions({hideSendBox: true});
     }
@@ -106,7 +111,35 @@ function App() {
           (chatSDK as any).chatToken = liveChatContext?.chatToken;
 
           const postChatSurveyContext = await chatSDK?.getPostChatSurveyContext();
-          setPostChatSurveyContext(postChatSurveyContext);
+
+          let embedPostChatSurvey = undefined;
+          if (postChatSurveyMode === PostChatSurveyMode.Embed) {
+            if (postChatSurveyContext?.participantType === 'User') {
+              embedPostChatSurvey = (
+                <iframe
+                  src={postChatSurveyContext?.surveyInviteLink}
+                  style={{
+                    height: "inherit",
+                    width: "100%",
+                    display: "block",
+                    border: 0
+                  }} />
+              );
+            } else if (postChatSurveyContext?.participantType === 'Bot') {
+              embedPostChatSurvey = (
+                <iframe
+                  src={postChatSurveyContext?.botSurveyInviteLink || postChatSurveyContext?.surveyInviteLink}
+                  style={{
+                    height: "inherit",
+                    width: "100%",
+                    display: "block",
+                    border: 0
+                  }} />
+              );
+            }
+          }
+
+          setEmbedPostChatSurvey(embedPostChatSurvey);
 
           // Clean up
           (chatSDK as any).requestId = requestId;
@@ -134,12 +167,48 @@ function App() {
       return;
     }
 
+    let cachedLiveChatContext = undefined;
+    if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
+      cachedLiveChatContext = getLiveChatContextFromCache();
+    }
+
+    if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false && !cachedLiveChatContext) {
+      const adaptiveCard = new AdaptiveCards.AdaptiveCard();
+      const preChatSurveyRaw = await chatSDK?.getPreChatSurvey(false);
+      const preChatSurvey = JSON.parse(preChatSurveyRaw.replaceAll("&#42;", "*")); // HTML entities '&#42;' is not unescaped for some reason
+      if (AppConfig.widget.preChatSurveyPane.log === true) {
+        console.log(preChatSurvey);
+      }
+
+      adaptiveCard.parse(preChatSurvey);
+
+      adaptiveCard.onExecuteAction = (action: any) => {
+        const preChatResponse = (action as any).data;
+
+        if (AppConfig.widget.preChatSurveyPane.log === true) {
+          console.log(preChatResponse);
+        }
+
+        setPreChatResponse(preChatResponse);
+        setWidgetState(WidgetState.PRECHATSURVEYSUBMITTED);
+      }
+
+      const renderedPreChatSurveyCard = adaptiveCard.render(); // Renders as HTML element
+      setRenderedPreChatSurveyCard(renderedPreChatSurveyCard);
+
+      setWidgetState(WidgetState.PRECHATSURVEY);
+      return;
+    }
+
     if (widgetState === WidgetState.CHAT) {
       return;
     }
 
     if (widgetState === WidgetState.MINIMIZED) { // Resumes chat
-      setWidgetState(WidgetState.CHAT);
+      if (recentWidgetState !== WidgetState.UNKNOWN) {
+        setRecentWidgetState(WidgetState.UNKNOWN);
+        setWidgetState(recentWidgetState);
+      }
       return;
     }
 
@@ -148,11 +217,13 @@ function App() {
     }
 
     const optionalParams: any = {};
+    if (preChatResponse && AppConfig.widget.preChatSurveyPane.disabled === false) {
+      optionalParams.preChatResponse = preChatResponse;
+    }
+
     if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
-      const cachedLiveChatContext = localStorage.getItem('liveChatContext');
-      if (cachedLiveChatContext && Object.keys(JSON.parse(cachedLiveChatContext)).length > 0) {
-        AppConfig.ChatSDK.liveChatContext && console.log("[liveChatContext]");
-        optionalParams.liveChatContext = JSON.parse(cachedLiveChatContext);
+      if (cachedLiveChatContext) {
+        optionalParams.liveChatContext = cachedLiveChatContext;
       }
     }
 
@@ -209,7 +280,7 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK, widgetState, errorMessage, isOutOfOperatingHours]);
+  }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isPreChatSurveyEnabled, preChatResponse]);
 
   const endChat = useCallback(async () => {
     if (widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false) {
@@ -228,7 +299,7 @@ function App() {
         await chatSDK?.endChat();
       }
 
-      setPostChatSurveyContext(null);
+      setEmbedPostChatSurvey(undefined);
       setLiveChatContext(null);
       setStyleOptions({});
       setConversationEndedByAgentFirst(false);
@@ -241,7 +312,7 @@ function App() {
         await chatSDK?.endChat();
       }
 
-      setPostChatSurveyContext(null);
+      setEmbedPostChatSurvey(undefined);
       setLiveChatContext(null);
       setStyleOptions({});
       setConversationEndedByAgentFirst(false);
@@ -260,7 +331,12 @@ function App() {
     }
 
     setWidgetState(WidgetState.ENDED);
-  }, [chatSDK, widgetState, conversationEndedByAgentFirst, isPostChatSurvey, postChatSurveyMode]);
+  }, [chatSDK, widgetState, conversationEndedByAgentFirst]);
+
+  const onMinimize = useCallback(() => {
+    setRecentWidgetState(widgetState);
+    setWidgetState(WidgetState.MINIMIZED);
+  }, [widgetState]);
 
   const WebChatThemeProvider = AppConfig.WebChat.FluentThemeProvider.disabled === false ? FluentThemeProvider: Fragment;
   return (
@@ -270,28 +346,38 @@ function App() {
       <LiveChatConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat}/>
       {widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false && <WidgetContainer>
-        <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             <span> {errorMessage || 'Error'} </span>
           </WidgetContent>
         </WidgetContainer>
       }
       {widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false && <WidgetContainer>
-        <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             <span> Offline </span>
           </WidgetContent>
         </WidgetContainer>
       }
+      {widgetState === WidgetState.PRECHATSURVEY && AppConfig.widget.preChatSurveyPane.disabled === false && <WidgetContainer>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
+          <WidgetContent>
+          <div ref={(n) => { // Returns React element
+            n && n.firstChild && n.removeChild(n.firstChild); // Removes duplicates fix
+            renderedPreChatSurveyCard && n && n.appendChild(renderedPreChatSurveyCard);
+          }} />
+          </WidgetContent>
+        </WidgetContainer>
+      }
       {widgetState === WidgetState.LOADING && AppConfig.widget.loadingPane.disabled === false && <WidgetContainer>
-          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             <span> Loading </span>
           </WidgetContent>
         </WidgetContainer>
       }
       { (widgetState === WidgetState.CHAT || (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false)) && <WidgetContainer>
-          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           {chatAdapter &&
             <WebChatThemeProvider>
               <ReactWebChat
@@ -299,32 +385,16 @@ function App() {
                 styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
                 activityMiddleware={createActivityMiddleware()}
                 attachmentMiddleware={createAttachmentMiddleware()}
+                cardActionMiddleware={createCardActionMiddleware()}
               />
             </WebChatThemeProvider>
           }
         </WidgetContainer>
       }
       { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
-          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
-            {postChatSurveyContext.participantType === 'User' && postChatSurveyMode === PostChatSurveyMode.Embed && <iframe
-              src={postChatSurveyContext?.surveyInviteLink}
-              style={{
-                height: "inherit",
-                width: "100%",
-                display: "block",
-                border: 0
-              }} />
-            }
-            {postChatSurveyContext.participantType === 'Bot' && postChatSurveyMode === PostChatSurveyMode.Embed && <iframe
-              src={postChatSurveyContext?.botSurveyInviteLink || postChatSurveyContext?.surveyInviteLink}
-              style={{
-                height: "inherit",
-                width: "100%",
-                display: "block",
-                border: 0
-              }} />
-            }
+            {embedPostChatSurvey}
           </WidgetContent>
         </WidgetContainer>
       }
