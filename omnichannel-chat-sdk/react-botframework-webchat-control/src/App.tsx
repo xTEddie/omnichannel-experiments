@@ -345,7 +345,7 @@ function App() {
     }
 
     setWidgetState(WidgetState.ENDED);
-  }, [chatSDK, widgetState, conversationEndedByAgentFirst, isPostChatSurvey, postChatSurveyMode]);
+  }, [chatSDK, widgetState, conversationEndedByAgentFirst]);
 
   const onMinimize = useCallback(() => {
     setRecentWidgetState(widgetState);
