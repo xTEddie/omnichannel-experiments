@@ -98,6 +98,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    AppConfig.widget.WidgetState.log && console.log(widgetState);
+  }, [widgetState]);
+
+  useEffect(() => {
     if (widgetState === WidgetState.PRECHATSURVEYSUBMITTED && AppConfig.widget.preChatSurveyPane.disabled === false) {
       startChat(); // Starts chat once pre-chat survey is submitted
       return;

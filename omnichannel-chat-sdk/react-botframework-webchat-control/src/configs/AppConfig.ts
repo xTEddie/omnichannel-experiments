@@ -17,6 +17,9 @@ const AppConfig = {
     }
   },
   widget: {
+    WidgetState: {
+      log: false // Log the widget state changes
+    },
     chatButton: {
       disabled: false
     },
