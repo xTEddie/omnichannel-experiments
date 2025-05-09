@@ -16,6 +16,11 @@ const AppConfig = {
       retrieveFromCache: true // Retrieve the live chat context from localStorage if available
     }
   },
+  components: {
+    WidgetContainer: {
+      log: true
+    }
+  },
   widget: {
     WidgetState: {
       log: false // Log the widget state changes
