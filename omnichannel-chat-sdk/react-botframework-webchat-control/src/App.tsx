@@ -49,7 +49,7 @@ function App() {
   const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
   const [isPreChatSurveyEnabled, setIsPreChatSurveyEnabled] = useState(false);
-  const [preChatSurvey, setPreChatSurvey] = useState<any>(undefined);
+  const [renderedPreChatSurveyCard, setRenderedPreChatSurveyCard] = useState<any>(undefined);
   const [preChatResponse, setPreChatResponse] = useState<any>(undefined);
   const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
   const [postChatSurveyMode, setPostChatSurveyMode] = useState<PostChatSurveyMode>();
@@ -148,8 +148,19 @@ function App() {
     }
 
     if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false) {
+      const adaptiveCard = new AdaptiveCards.AdaptiveCard();
       const preChatSurvey = await chatSDK?.getPreChatSurvey();
-      setPreChatSurvey(preChatSurvey);
+      adaptiveCard.parse(preChatSurvey);
+
+      adaptiveCard.onExecuteAction = (action: any) => {
+        const preChatResponse = (action as any).data;
+        setPreChatResponse(preChatResponse);
+        setWidgetState(WidgetState.PRECHATSURVEYSUBMITTED);
+      }
+
+      const renderedPreChatSurveyCard = adaptiveCard.render(); // Renders as HTML element
+      setRenderedPreChatSurveyCard(renderedPreChatSurveyCard);
+
       setWidgetState(WidgetState.PRECHATSURVEY);
       return;
     }
@@ -290,24 +301,6 @@ function App() {
     setWidgetState(WidgetState.MINIMIZED);
   }, []);
 
-  const renderPreChatSurvey = useCallback(() => {
-    const adaptiveCard = new AdaptiveCards.AdaptiveCard();
-    adaptiveCard.parse(preChatSurvey);
-
-    adaptiveCard.onExecuteAction = (action: any) => {
-      const preChatResponse = (action as any).data;
-      setPreChatResponse(preChatResponse);
-      setWidgetState(WidgetState.PRECHATSURVEYSUBMITTED);
-    }
-
-    const renderedCard = adaptiveCard.render(); // Renders as HTML element
-
-    return <div ref={(n) => { // Returns React element
-      n && n.firstChild && n.removeChild(n.firstChild); // Removes duplicates fix
-      renderedCard && n && n.appendChild(renderedCard);
-    }} />
-  }, [preChatSurvey]);
-
   const WebChatThemeProvider = AppConfig.WebChat.FluentThemeProvider.disabled === false ? FluentThemeProvider: Fragment;
   return (
     <>
@@ -332,7 +325,10 @@ function App() {
       {widgetState === WidgetState.PRECHATSURVEY && AppConfig.widget.preChatSurveyPane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
-            {renderPreChatSurvey()}
+          <div ref={(n) => { // Returns React element
+            n && n.firstChild && n.removeChild(n.firstChild); // Removes duplicates fix
+            renderedPreChatSurveyCard && n && n.appendChild(renderedPreChatSurveyCard);
+          }} />
           </WidgetContent>
         </WidgetContainer>
       }
