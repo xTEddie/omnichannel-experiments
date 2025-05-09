@@ -55,7 +55,7 @@ function App() {
   const [preChatResponse, setPreChatResponse] = useState<any>(undefined);
   const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
   const [postChatSurveyMode, setPostChatSurveyMode] = useState<PostChatSurveyMode>();
-  const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
+  const [embedPostChatSurvey, setEmbedPostChatSurvey] = useState<any> (undefined);;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [styleOptions, setStyleOptions] = useState<any>({});
   const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
@@ -125,7 +125,35 @@ function App() {
           (chatSDK as any).chatToken = liveChatContext?.chatToken;
 
           const postChatSurveyContext = await chatSDK?.getPostChatSurveyContext();
-          setPostChatSurveyContext(postChatSurveyContext);
+
+          let embedPostChatSurvey = undefined;
+          if (postChatSurveyMode === PostChatSurveyMode.Embed) {
+            if (postChatSurveyContext?.participantType === 'User') {
+              embedPostChatSurvey = (
+                <iframe
+                  src={postChatSurveyContext?.surveyInviteLink}
+                  style={{
+                    height: "inherit",
+                    width: "100%",
+                    display: "block",
+                    border: 0
+                  }} />
+              );
+            } else if (postChatSurveyContext?.participantType === 'Bot') {
+              embedPostChatSurvey = (
+                <iframe
+                  src={postChatSurveyContext?.botSurveyInviteLink || postChatSurveyContext?.surveyInviteLink}
+                  style={{
+                    height: "inherit",
+                    width: "100%",
+                    display: "block",
+                    border: 0
+                  }} />
+              );
+            }
+          }
+
+          setEmbedPostChatSurvey(embedPostChatSurvey);
 
           // Clean up
           (chatSDK as any).requestId = requestId;
@@ -285,7 +313,7 @@ function App() {
         await chatSDK?.endChat();
       }
 
-      setPostChatSurveyContext(null);
+      setEmbedPostChatSurvey(undefined);
       setLiveChatContext(null);
       setStyleOptions({});
       setConversationEndedByAgentFirst(false);
@@ -298,7 +326,7 @@ function App() {
         await chatSDK?.endChat();
       }
 
-      setPostChatSurveyContext(null);
+      setEmbedPostChatSurvey(undefined);
       setLiveChatContext(null);
       setStyleOptions({});
       setConversationEndedByAgentFirst(false);
@@ -380,24 +408,7 @@ function App() {
       { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
-            {postChatSurveyContext.participantType === 'User' && postChatSurveyMode === PostChatSurveyMode.Embed && <iframe
-              src={postChatSurveyContext?.surveyInviteLink}
-              style={{
-                height: "inherit",
-                width: "100%",
-                display: "block",
-                border: 0
-              }} />
-            }
-            {postChatSurveyContext.participantType === 'Bot' && postChatSurveyMode === PostChatSurveyMode.Embed && <iframe
-              src={postChatSurveyContext?.botSurveyInviteLink || postChatSurveyContext?.surveyInviteLink}
-              style={{
-                height: "inherit",
-                width: "100%",
-                display: "block",
-                border: 0
-              }} />
-            }
+            {embedPostChatSurvey}
           </WidgetContent>
         </WidgetContainer>
       }
