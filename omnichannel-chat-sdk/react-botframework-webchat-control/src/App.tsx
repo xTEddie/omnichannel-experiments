@@ -27,7 +27,7 @@ enum WidgetState {
   CHAT = 'CHAT', // Chat is in progress
   ENDED = 'ENDED', // Chat has ended
   READONLY = 'READONLY', // Chat has ended but in read-only mode to display post-chat survey
-  POSTCHATSURVEY = 'POSTCHATSURVEY',
+  POSTCHATSURVEY = 'POSTCHATSURVEY', // Rendering post-chat survey on embed mode
   MINIMIZED = 'MINIMIZED', // Chat is minimized
   OFFLINE = 'OFFLINE', // Chat is out of business hours
   ERROR = 'ERROR' // Chat is in error state
