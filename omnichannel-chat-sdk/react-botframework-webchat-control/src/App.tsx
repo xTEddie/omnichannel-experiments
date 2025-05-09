@@ -25,6 +25,7 @@ enum WidgetState {
   LOADING = 'LOADING', // Chat started but not fully completed yet
   CHAT = 'CHAT', // Chat is in progress
   ENDED = 'ENDED', // Chat has ended
+  READONLY = 'READONLY', // Chat has ended but in read-only mode to display post-chat survey
   POSTCHATSURVEY = 'POSTCHATSURVEY',
   MINIMIZED = 'MINIMIZED', // Chat is minimized
   OFFLINE = 'OFFLINE', // Chat is out of business hours
@@ -88,6 +89,11 @@ function App() {
   useEffect(() => {
     if (widgetState === WidgetState.ENDED) {
       if (isPostChatSurvey && AppConfig.widget.postChatSurveyPane.disabled === false) {
+        if (postChatSurveyMode === PostChatSurveyMode.Link) {
+          setWidgetState(WidgetState.READONLY);
+          return;
+        }
+
         const renderPostChatSurvey = async () => {
           const requestId = chatSDK?.requestId; // save the requestId for later use
           (chatSDK as any).requestId = liveChatContext?.requestId;
@@ -109,7 +115,7 @@ function App() {
 
       setWidgetState(WidgetState.READY);
     }
-  }, [chatSDK, widgetState, isPostChatSurvey, liveChatContext]);
+  }, [chatSDK, widgetState, isPostChatSurvey, postChatSurveyMode, liveChatContext]);
 
   const startChat = useCallback(async () => {
     if (errorMessage && AppConfig.widget.errorPane.disabled === false) {
@@ -207,6 +213,13 @@ function App() {
       return;
     }
 
+    if (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false) {
+      setPostChatSurveyContext(null);
+      setLiveChatContext(null);
+      setWidgetState(WidgetState.READY);
+      return;
+    }
+
     if (widgetState !== WidgetState.CHAT) {
       return;
     }
@@ -226,7 +239,7 @@ function App() {
       <h1>ChatSDK Sample</h1>
       <AppDetails />
       <LiveChatConfigurations chatConfig={chatConfig} />
-      <ChatCommands startChat={startChat} endChat={endChat} />
+      <ChatCommands startChat={startChat} endChat={endChat}/>
       {widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           <WidgetContent>
@@ -248,7 +261,7 @@ function App() {
           </WidgetContent>
         </WidgetContainer>
       }
-      { widgetState === WidgetState.CHAT && <WidgetContainer>
+      { (widgetState === WidgetState.CHAT || (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false)) && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           {chatAdapter &&
             <WebChatThemeProvider>
