@@ -265,11 +265,6 @@ function App() {
     await chatSDK?.onAgentEndSession(() => {
       setConversationEndedByAgentFirst(true);
       if (isPostChatSurvey && AppConfig.widget.postChatSurveyPane.disabled === false) {
-        if (postChatSurveyMode === PostChatSurveyMode.Link) {
-          setWidgetState(WidgetState.READONLY);
-          return;
-        }
-
         setWidgetState(WidgetState.ENDED);
       }
     });
