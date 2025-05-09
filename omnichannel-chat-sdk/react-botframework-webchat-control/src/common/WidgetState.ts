@@ -1,6 +1,15 @@
 /**
  * WidgetState enum represents the various states of the chat widget.
  * Each state indicates a specific phase in the chat lifecycle.
+ * 
+ * Examples: 
+ * - Normal chat: UNKNOWN -> READY -> LOADING -> CHAT -> ENDED -> READY
+ * - Out of business hours chat: UNKNOWN -> READY -> OFFLINE
+ * - Pre-chat survey: UNKNOWN -> READY -> PRECHATSURVEY -> PRECHATSURVEYSUBMITTED -> LOADING -> CHAT -> ENDED -> READY
+ * - Post-chat survey on embed mode: UNKNOWN -> READY -> LOADING -> CHAT -> ENDED -> POSTCHATSURVEY -> READY
+ * - Post-chat survey on link mode: UNKNOWN -> READY -> LOADING -> CHAT -> ENDED -> READONLY -> READY
+ * - Chat in error state: UNKNOWN -> READY -> [ANY STATE] -> ERROR -> READY
+ * - Minimizing chat: UKNOWN -> READY -> [ANY STATE] -> MINIMIZED -> [RECENT STATE] -> [...]
  */
 enum WidgetState {
   UNKNOWN = 'UNKNOWN', // Initial state of the widget, not yet determined
