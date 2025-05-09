@@ -49,7 +49,7 @@ function App() {
   const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [styleOptions, setStyleOptions] = useState<any>({});
-  const [agentEnded, setAgentEnded] = useState(false);
+  const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -89,7 +89,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (widgetState === WidgetState.READONLY) {
+    if (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false) {
       setStyleOptions({hideSendBox: true});
     }
 
@@ -192,8 +192,15 @@ function App() {
     setWidgetState(WidgetState.CHAT);
     console.log("Chat started!");
     await chatSDK?.onAgentEndSession(() => {
-      setAgentEnded(true);
-      setWidgetState(WidgetState.READONLY);
+      setConversationEndedByAgentFirst(true);
+      if (isPostChatSurvey && AppConfig.widget.postChatSurveyPane.disabled === false) {
+        if (postChatSurveyMode === PostChatSurveyMode.Link) {
+          setWidgetState(WidgetState.READONLY);
+          return;
+        }
+
+        setWidgetState(WidgetState.ENDED);
+      }
     });
     await chatSDK?.onNewMessage((message: any) => {
       AppConfig.ChatSDK.onNewMessage.log && console.log(`New message!`);
@@ -217,19 +224,27 @@ function App() {
     }
 
     if (widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false) {
+      if (conversationEndedByAgentFirst) {
+        await chatSDK?.endChat();
+      }
+
       setPostChatSurveyContext(null);
       setLiveChatContext(null);
       setStyleOptions({});
-      setAgentEnded(false);
+      setConversationEndedByAgentFirst(false);
       setWidgetState(WidgetState.READY);
       return;
     }
 
     if (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false) {
+      if (conversationEndedByAgentFirst) {
+        await chatSDK?.endChat();
+      }
+
       setPostChatSurveyContext(null);
       setLiveChatContext(null);
       setStyleOptions({});
-      setAgentEnded(false);
+      setConversationEndedByAgentFirst(false);
       setWidgetState(WidgetState.READY);
       return;
     }
@@ -245,7 +260,7 @@ function App() {
     }
 
     setWidgetState(WidgetState.ENDED);
-  }, [chatSDK, widgetState]);
+  }, [chatSDK, widgetState, conversationEndedByAgentFirst, isPostChatSurvey, postChatSurveyMode]);
 
   const WebChatThemeProvider = AppConfig.WebChat.FluentThemeProvider.disabled === false ? FluentThemeProvider: Fragment;
   return (
