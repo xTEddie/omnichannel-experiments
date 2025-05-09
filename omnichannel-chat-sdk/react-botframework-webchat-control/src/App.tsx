@@ -153,7 +153,12 @@ function App() {
       return;
     }
 
-    if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false) {
+    let cachedLiveChatContext = undefined;
+    if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
+      cachedLiveChatContext = getLiveChatContextFromCache();
+    }
+
+    if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false && !cachedLiveChatContext) {
       const adaptiveCard = new AdaptiveCards.AdaptiveCard();
       const preChatSurvey = await chatSDK?.getPreChatSurvey();
       if (AppConfig.widget.preChatSurveyPane.log === true) {
@@ -202,7 +207,6 @@ function App() {
     }
 
     if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
-      const cachedLiveChatContext = getLiveChatContextFromCache();
       if (cachedLiveChatContext) {
         optionalParams.liveChatContext = cachedLiveChatContext;
       }
