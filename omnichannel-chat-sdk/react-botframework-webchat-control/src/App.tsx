@@ -43,6 +43,7 @@ enum PostChatSurveyMode {
 
 function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
+  const [recentWidgetState, setRecentWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
   const [chatConfig, setChatConfig] = useState<any>(undefined);
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
@@ -170,7 +171,10 @@ function App() {
     }
 
     if (widgetState === WidgetState.MINIMIZED) { // Resumes chat
-      setWidgetState(WidgetState.CHAT);
+      if (recentWidgetState !== WidgetState.UNKNOWN) {
+        setRecentWidgetState(WidgetState.UNKNOWN);
+        setWidgetState(recentWidgetState);
+      }
       return;
     }
 
@@ -244,7 +248,7 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK, widgetState, errorMessage, isOutOfOperatingHours, isPreChatSurveyEnabled, preChatResponse]);
+  }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isPreChatSurveyEnabled, preChatResponse]);
 
   const endChat = useCallback(async () => {
     if (widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false) {
@@ -298,8 +302,9 @@ function App() {
   }, [chatSDK, widgetState, conversationEndedByAgentFirst, isPostChatSurvey, postChatSurveyMode]);
 
   const onMinimize = useCallback(() => {
+    setRecentWidgetState(widgetState);
     setWidgetState(WidgetState.MINIMIZED);
-  }, []);
+  }, [widgetState]);
 
   const WebChatThemeProvider = AppConfig.WebChat.FluentThemeProvider.disabled === false ? FluentThemeProvider: Fragment;
   return (
