@@ -26,6 +26,9 @@ const AppConfig = {
     offlinePane: {
       disabled: false
     },
+    preChatSurveyPane: {
+      disabled: false
+    },
     loadingPane: {
       disabled: false
     },
