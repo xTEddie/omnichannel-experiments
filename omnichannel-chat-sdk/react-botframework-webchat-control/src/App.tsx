@@ -286,6 +286,10 @@ function App() {
     setWidgetState(WidgetState.ENDED);
   }, [chatSDK, widgetState, conversationEndedByAgentFirst, isPostChatSurvey, postChatSurveyMode]);
 
+  const onMinimize = useCallback(() => {
+    setWidgetState(WidgetState.MINIMIZED);
+  }, []);
+
   const renderPreChatSurvey = useCallback(() => {
     const adaptiveCard = new AdaptiveCards.AdaptiveCard();
     adaptiveCard.parse(preChatSurvey);
@@ -312,35 +316,35 @@ function App() {
       <LiveChatConfigurations chatConfig={chatConfig} />
       <ChatCommands startChat={startChat} endChat={endChat}/>
       {widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false && <WidgetContainer>
-        <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             <span> {errorMessage || 'Error'} </span>
           </WidgetContent>
         </WidgetContainer>
       }
       {widgetState === WidgetState.OFFLINE && AppConfig.widget.offlinePane.disabled === false && <WidgetContainer>
-        <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             <span> Offline </span>
           </WidgetContent>
         </WidgetContainer>
       }
       {widgetState === WidgetState.PRECHATSURVEY && AppConfig.widget.preChatSurveyPane.disabled === false && <WidgetContainer>
-          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             {renderPreChatSurvey()}
           </WidgetContent>
         </WidgetContainer>
       }
       {widgetState === WidgetState.LOADING && AppConfig.widget.loadingPane.disabled === false && <WidgetContainer>
-          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             <span> Loading </span>
           </WidgetContent>
         </WidgetContainer>
       }
       { (widgetState === WidgetState.CHAT || (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false)) && <WidgetContainer>
-          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           {chatAdapter &&
             <WebChatThemeProvider>
               <ReactWebChat
@@ -355,7 +359,7 @@ function App() {
         </WidgetContainer>
       }
       { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
-          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+        <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
             {postChatSurveyContext.participantType === 'User' && postChatSurveyMode === PostChatSurveyMode.Embed && <iframe
               src={postChatSurveyContext?.surveyInviteLink}
