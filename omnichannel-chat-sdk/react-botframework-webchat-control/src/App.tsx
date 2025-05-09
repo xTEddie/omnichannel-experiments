@@ -155,10 +155,19 @@ function App() {
     if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false) {
       const adaptiveCard = new AdaptiveCards.AdaptiveCard();
       const preChatSurvey = await chatSDK?.getPreChatSurvey();
+      if (AppConfig.widget.preChatSurveyPane.log === true) {
+        console.log(preChatSurvey);
+      }
+
       adaptiveCard.parse(preChatSurvey);
 
       adaptiveCard.onExecuteAction = (action: any) => {
         const preChatResponse = (action as any).data;
+
+        if (AppConfig.widget.preChatSurveyPane.log === true) {
+          console.log(preChatResponse);
+        }
+
         setPreChatResponse(preChatResponse);
         setWidgetState(WidgetState.PRECHATSURVEYSUBMITTED);
       }

@@ -30,6 +30,7 @@ const AppConfig = {
       disabled: false
     },
     preChatSurveyPane: {
+      log: false,
       disabled: false
     },
     loadingPane: {
