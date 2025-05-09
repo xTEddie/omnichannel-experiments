@@ -1,3 +1,4 @@
+import * as AdaptiveCards from 'adaptivecards';
 import { useCallback, useEffect, useState, Fragment } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
@@ -23,6 +24,8 @@ import './App.css';
 enum WidgetState {
   UNKNOWN = 'UNKNOWN',
   READY = 'READY', // Widget is ready to be used
+  PRECHATSURVEY = 'PRECHATSURVEY', // Rendering pre-chat survey
+  PRECHATSURVEYSUBMITTED = 'PRECHATSURVEYSUBMITTED', // Pre-chat survey has been submitted
   LOADING = 'LOADING', // Chat started but not fully completed yet
   CHAT = 'CHAT', // Chat is in progress
   ENDED = 'ENDED', // Chat has ended
@@ -45,6 +48,9 @@ function App() {
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
   const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
+  const [isPreChatSurveyEnabled, setIsPreChatSurveyEnabled] = useState(false);
+  const [preChatSurvey, setPreChatSurvey] = useState<any>(undefined);
+  const [preChatResponse, setPreChatResponse] = useState<any>(undefined);
   const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
   const [postChatSurveyMode, setPostChatSurveyMode] = useState<PostChatSurveyMode>();
   const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
@@ -78,7 +84,8 @@ function App() {
       }
 
       const {LiveWSAndLiveChatEngJoin} = chatConfig;
-      const {OutOfOperatingHours, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
+      const {OutOfOperatingHours, msdyn_prechatenabled, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
+      setIsPreChatSurveyEnabled(parseLowerCaseString(msdyn_prechatenabled) === 'true');
       setPostChatSurveyMode(msdyn_postconversationsurveymode);
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
       setIsPostChatSurvey(parseLowerCaseString(msdyn_postconversationsurveyenable) === 'true');
@@ -90,6 +97,11 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (widgetState === WidgetState.PRECHATSURVEYSUBMITTED && AppConfig.widget.preChatSurveyPane.disabled === false) {
+      startChat(); // Starts chat once pre-chat survey is submitted
+      return;
+    }
+
     if (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false) {
       setStyleOptions({hideSendBox: true});
     }
@@ -135,6 +147,13 @@ function App() {
       return;
     }
 
+    if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false) {
+      const preChatSurvey = await chatSDK?.getPreChatSurvey();
+      setPreChatSurvey(preChatSurvey);
+      setWidgetState(WidgetState.PRECHATSURVEY);
+      return;
+    }
+
     if (widgetState === WidgetState.CHAT) {
       return;
     }
@@ -149,6 +168,10 @@ function App() {
     }
 
     const optionalParams: any = {};
+    if (preChatResponse && AppConfig.widget.preChatSurveyPane.disabled === false) {
+      optionalParams.preChatResponse = preChatResponse;
+    }
+
     if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
       const cachedLiveChatContext = localStorage.getItem('liveChatContext');
       if (cachedLiveChatContext && Object.keys(JSON.parse(cachedLiveChatContext)).length > 0) {
@@ -210,7 +233,7 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK, widgetState, errorMessage, isOutOfOperatingHours]);
+  }, [chatSDK, widgetState, errorMessage, isOutOfOperatingHours, isPreChatSurveyEnabled, preChatResponse]);
 
   const endChat = useCallback(async () => {
     if (widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false) {
@@ -263,6 +286,24 @@ function App() {
     setWidgetState(WidgetState.ENDED);
   }, [chatSDK, widgetState, conversationEndedByAgentFirst, isPostChatSurvey, postChatSurveyMode]);
 
+  const renderPreChatSurvey = useCallback(() => {
+    const adaptiveCard = new AdaptiveCards.AdaptiveCard();
+    adaptiveCard.parse(preChatSurvey);
+
+    adaptiveCard.onExecuteAction = (action: any) => {
+      const preChatResponse = (action as any).data;
+      setPreChatResponse(preChatResponse);
+      setWidgetState(WidgetState.PRECHATSURVEYSUBMITTED);
+    }
+
+    const renderedCard = adaptiveCard.render(); // Renders as HTML element
+
+    return <div ref={(n) => { // Returns React element
+      n && n.firstChild && n.removeChild(n.firstChild); // Removes duplicates fix
+      renderedCard && n && n.appendChild(renderedCard);
+    }} />
+  }, [preChatSurvey]);
+
   const WebChatThemeProvider = AppConfig.WebChat.FluentThemeProvider.disabled === false ? FluentThemeProvider: Fragment;
   return (
     <>
@@ -281,6 +322,13 @@ function App() {
         <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
           <WidgetContent>
             <span> Offline </span>
+          </WidgetContent>
+        </WidgetContainer>
+      }
+      {widgetState === WidgetState.PRECHATSURVEY && AppConfig.widget.preChatSurveyPane.disabled === false && <WidgetContainer>
+          <ChatHeader onClose={endChat} onMinimize={() => {setWidgetState(WidgetState.MINIMIZED)}}/>
+          <WidgetContent>
+            {renderPreChatSurvey()}
           </WidgetContent>
         </WidgetContainer>
       }
