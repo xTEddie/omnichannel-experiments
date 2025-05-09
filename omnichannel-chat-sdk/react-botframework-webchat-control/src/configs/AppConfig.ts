@@ -20,10 +20,16 @@ const AppConfig = {
     chatButton: {
       disabled: false
     },
+    errorPane: {
+      disabled: false
+    },
     offlinePane: {
       disabled: false
     },
     loadingPane: {
+      disabled: false
+    },
+    postChatSurveyPane: {
       disabled: false
     }
   },
@@ -48,6 +54,10 @@ const AppConfig = {
           log: false // Log WebChat 'user' role messages (Any outgoing messages)
         }
       }
+    },
+    attachmentMiddleware: {
+      disabled: false,
+      log: false // Log attachment middleware events
     }
   }
 };
