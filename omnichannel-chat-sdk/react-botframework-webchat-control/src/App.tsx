@@ -49,6 +49,7 @@ function App() {
   const [postChatSurveyContext, setPostChatSurveyContext] = useState<any>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [styleOptions, setStyleOptions] = useState<any>({});
+  const [agentEnded, setAgentEnded] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -190,6 +191,10 @@ function App() {
 
     setWidgetState(WidgetState.CHAT);
     console.log("Chat started!");
+    await chatSDK?.onAgentEndSession(() => {
+      setAgentEnded(true);
+      setWidgetState(WidgetState.READONLY);
+    });
     await chatSDK?.onNewMessage((message: any) => {
       AppConfig.ChatSDK.onNewMessage.log && console.log(`New message!`);
       AppConfig.ChatSDK.onNewMessage.log && console.log(message?.content);
@@ -215,6 +220,7 @@ function App() {
       setPostChatSurveyContext(null);
       setLiveChatContext(null);
       setStyleOptions({});
+      setAgentEnded(false);
       setWidgetState(WidgetState.READY);
       return;
     }
@@ -223,6 +229,7 @@ function App() {
       setPostChatSurveyContext(null);
       setLiveChatContext(null);
       setStyleOptions({});
+      setAgentEnded(false);
       setWidgetState(WidgetState.READY);
       return;
     }
