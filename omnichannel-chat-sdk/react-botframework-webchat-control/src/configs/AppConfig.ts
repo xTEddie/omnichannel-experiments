@@ -18,7 +18,7 @@ const AppConfig = {
   },
   components: {
     WidgetContainer: {
-      log: true
+      log: false
     }
   },
   widget: {
@@ -74,6 +74,9 @@ const AppConfig = {
     cardActionMiddleware: {
       disabled: false,
       log: false // Log card action middleware events
+    },
+    sendBoxMiddleware: {
+      disabled: true
     }
   }
 };

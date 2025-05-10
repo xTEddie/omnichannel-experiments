@@ -15,6 +15,7 @@ import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
 import createAttachmentMiddleware from './middlewares/native/createAttachmentMiddleware';
 import createCardActionMiddleware from './middlewares/native/createCardActionMiddleware';
+import createSendBoxMiddleware from './middlewares/native/createSendBoxMiddleware';
 import LiveChatConfigurations from './components/LiveChatConfigurations/LiveChatConfigurations';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
 import WidgetContent from './components/WidgetContent/WidgetContent';
@@ -381,6 +382,7 @@ function App() {
                 activityMiddleware={createActivityMiddleware()}
                 attachmentMiddleware={createAttachmentMiddleware()}
                 cardActionMiddleware={createCardActionMiddleware()}
+                sendBoxMiddleware={createSendBoxMiddleware()}
               />
             </WebChatThemeProvider>
           }
