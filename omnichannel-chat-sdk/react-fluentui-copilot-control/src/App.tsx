@@ -1,33 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect } from 'react'
+import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
+import AppConfig from './configs/AppConfig';
+import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  useEffect(() => {
+    const init = async () => {
+      const omnichannelConfig = fetchOmnichannelConfig();
+      const chatSDK = new OmnichannelChatSDK(omnichannelConfig);
+      await chatSDK.initialize();
+
+      const chatConfig = await chatSDK.getLiveChatConfig();
+      if (AppConfig.ChatSDK.liveChatConfig.log) {
+        console.log(chatConfig);
+      }
+    }
+
+    init();
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>ChatSDK Sample</h1>
     </>
   )
 }
