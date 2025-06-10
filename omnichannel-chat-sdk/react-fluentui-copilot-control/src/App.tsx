@@ -188,7 +188,7 @@ function App() {
       { widgetState === WidgetState.CHAT && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
-            <div style={{display: 'flex', flexDirection: 'column', fontSize: '12px', height: '100%'}}>
+            <div style={{display: 'flex', flexDirection: 'column', fontSize: '12px', width: '100%', overflowY: 'scroll', overflowX: 'hidden'}}>
               {messages.map((message, index) => {
                 if (message.html) {
                   return <>{message.html}</>
