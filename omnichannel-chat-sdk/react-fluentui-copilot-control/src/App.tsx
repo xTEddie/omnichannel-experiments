@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import AppConfig from './configs/AppConfig';
+import AppDetails from './components/AppDetails/AppDetails';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import './App.css'
 
@@ -23,6 +24,7 @@ function App() {
   return (
     <>
       <h1>ChatSDK Sample</h1>
+      <AppDetails />
     </>
   )
 }
