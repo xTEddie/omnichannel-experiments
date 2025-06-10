@@ -9,11 +9,13 @@ import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
 import WidgetContent from './components/WidgetContent/WidgetContent';
 import WidgetState from './common/WidgetState';
+import getLiveChatContextFromCache from './utils/getLiveChatContextFromCache';
 import './App.css'
 
 function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
+  const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
   const [messages, setMessages] = useState<any[]>([]);
   const [userMessage, setUserMessage] = useState<string>('');
 
@@ -28,6 +30,10 @@ function App() {
       const chatConfig = await chatSDK.getLiveChatConfig();
       if (AppConfig.ChatSDK.liveChatConfig.log) {
         console.log(chatConfig);
+      }
+
+      if (AppConfig.ChatSDK.liveChatContext.reset) {
+        localStorage.removeItem('liveChatContext');
       }
 
       setWidgetState(WidgetState.READY);
@@ -85,14 +91,32 @@ function App() {
       return;
     }
 
+    let cachedLiveChatContext = undefined;
+    if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
+      cachedLiveChatContext = getLiveChatContextFromCache();
+    }
+
     if (widgetState === WidgetState.CHAT) {
       return;
     }
 
+    const optionalParams: any = {};
+    if (AppConfig.ChatSDK.liveChatContext.retrieveFromCache) {
+      if (cachedLiveChatContext) {
+        optionalParams.liveChatContext = cachedLiveChatContext;
+      }
+    }
+
     try {
-      await chatSDK.startChat();
+      await chatSDK?.startChat(optionalParams);
     } catch (error: any) {
       console.error(error);
+    }
+
+    const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
+    setLiveChatContext(liveChatContext);
+    if (AppConfig.ChatSDK.liveChatContext.cache) {
+      localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
     }
 
     await chatSDK?.onNewMessage((message: any) => {
@@ -119,6 +143,10 @@ function App() {
       await chatSDK.endChat();
     } catch (error: any) {
       console.error(error);
+    }
+
+    if (AppConfig.ChatSDK.liveChatContext.cache) {
+      localStorage.removeItem('liveChatContext');
     }
 
     console.log("Chat ended!");
