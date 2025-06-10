@@ -4,9 +4,11 @@ import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
 import ChatCommands from './components/ChatCommands/ChatCommands';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
+import WidgetState from './common/WidgetState';
 import './App.css'
 
 function App() {
+  const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
 
   useEffect(() => {
@@ -21,13 +23,29 @@ function App() {
       if (AppConfig.ChatSDK.liveChatConfig.log) {
         console.log(chatConfig);
       }
+
+      setWidgetState(WidgetState.READY);
     }
 
     init();
   }, []);
 
+  useEffect(() => {
+    AppConfig.widget.WidgetState.log && console.log(widgetState);
+  }, [widgetState]);
+
+  useEffect(() => {
+    if (widgetState === WidgetState.ENDED) {
+      setWidgetState(WidgetState.READY);
+    }
+  }, [widgetState]);
+
   const startChat = useCallback(async () => {
     if (!chatSDK) {
+      return;
+    }
+
+    if (widgetState === WidgetState.CHAT) {
       return;
     }
 
@@ -42,11 +60,17 @@ function App() {
       AppConfig.ChatSDK.onNewMessage.log && console.log(message?.content);
     });
 
+    setWidgetState(WidgetState.CHAT);
+
     console.log("Chat started!");
-  }, [chatSDK]);
+  }, [chatSDK, widgetState]);
 
   const endChat = useCallback(async () => {
     if (!chatSDK) {
+      return;
+    }
+
+    if (widgetState !== WidgetState.CHAT) {
       return;
     }
 
@@ -57,7 +81,8 @@ function App() {
     }
 
     console.log("Chat ended!");
-  }, [chatSDK]);
+    setWidgetState(WidgetState.ENDED);
+  }, [chatSDK, widgetState]);
 
   return (
     <>

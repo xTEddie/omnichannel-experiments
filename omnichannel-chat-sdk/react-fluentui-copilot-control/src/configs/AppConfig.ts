@@ -6,6 +6,11 @@ const AppConfig = {
     onNewMessage: {
       log: true
     }
+  },
+  widget: {
+    WidgetState: {
+      log: true // Log the widget state changes
+    }
   }
 }
 
