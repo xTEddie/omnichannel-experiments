@@ -3,7 +3,10 @@ import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
 import ChatCommands from './components/ChatCommands/ChatCommands';
+import ChatHeader from './components/ChatHeader/ChatHeader';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
+import WidgetContainer from './components/WidgetContainer/WidgetContainer';
+import WidgetContent from './components/WidgetContent/WidgetContent';
 import WidgetState from './common/WidgetState';
 import './App.css'
 
@@ -86,11 +89,28 @@ function App() {
     setWidgetState(WidgetState.ENDED);
   }, [chatSDK, widgetState]);
 
+  const onMinimize = useCallback(() => {
+    console.log("Minimize!");
+  }, []);
+
   return (
     <>
       <h1>ChatSDK Sample</h1>
       <AppDetails />
       <ChatCommands startChat={startChat} endChat={endChat}/>
+      { widgetState === WidgetState.CHAT && <WidgetContainer>
+          <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
+          <WidgetContent>
+            <div style={{display: 'flex', flexDirection: 'column', fontSize: '12px'}}>
+              {messages.map((message, index) => {
+                return (
+                  <li> {message.content} </li>
+                );
+              })}
+            </div>
+          </WidgetContent>
+        </WidgetContainer>
+      }
     </>
   )
 }
