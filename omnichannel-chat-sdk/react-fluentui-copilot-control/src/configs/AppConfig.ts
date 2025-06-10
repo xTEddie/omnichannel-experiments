@@ -7,6 +7,11 @@ const AppConfig = {
       log: true
     }
   },
+  components: {
+    WidgetContainer: {
+      log: true
+    }
+  },
   widget: {
     WidgetState: {
       log: true // Log the widget state changes
