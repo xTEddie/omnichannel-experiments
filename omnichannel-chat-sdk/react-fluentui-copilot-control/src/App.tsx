@@ -14,6 +14,7 @@ function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
   const [messages, setMessages] = useState<any[]>([]);
+  const [userMessage, setUserMessage] = useState<string>('');
 
   useEffect(() => {
     const init = async () => {
@@ -89,6 +90,17 @@ function App() {
     setWidgetState(WidgetState.ENDED);
   }, [chatSDK, widgetState]);
 
+  const onTextChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setUserMessage(event.target.value);
+  }, []);
+
+  const onSend = useCallback(async () => {
+    console.log('Send message!');
+    const response = await chatSDK.sendMessage({content: userMessage});
+    setMessages((prevMessages) => [...prevMessages, response]);
+    setUserMessage('');
+  }, [chatSDK, userMessage]);
+
   const onMinimize = useCallback(() => {
     console.log("Minimize!");
   }, []);
@@ -101,12 +113,16 @@ function App() {
       { widgetState === WidgetState.CHAT && <WidgetContainer>
           <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
-            <div style={{display: 'flex', flexDirection: 'column', fontSize: '12px'}}>
+            <div style={{display: 'flex', flexDirection: 'column', fontSize: '12px', height: '100%'}}>
               {messages.map((message, index) => {
                 return (
                   <li> {message.content} </li>
                 );
               })}
+            </div>
+            <div style={{display: 'flex', width: '100%'}}>
+              <textarea placeholder="Type message..." cols="50" rows="5" style={{border: 'none', resize: 'none'}} onChange={onTextChange}></textarea>
+              <button onClick={onSend}>Send</button>
             </div>
           </WidgetContent>
         </WidgetContainer>
