@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import * as AdaptiveCards from 'adaptivecards';
+import { useCallback, useEffect, useState } from 'react';
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
@@ -45,6 +46,40 @@ function App() {
     }
   }, [widgetState]);
 
+  const newMessageHandler = useCallback((message: any) => {
+    let html = '';
+    if (message.content) {
+      let suggestedActions = null;
+      if (message.content.includes(`"contentType"`) || message.content.includes(`"suggestedActions"`)) {
+        try {
+          const data = JSON.parse(message.content);
+          if (data.suggestedActions) {
+            suggestedActions = data.suggestedActions;
+            if (data.text) {
+              html = (
+                <div>
+                  <span>{data.text}</span>
+                  { suggestedActions.actions.map((action: any, index: number) => {
+                    return (
+                      <li key={index}> {action.text} </li>
+                    )
+                  })}
+                </div>
+              );
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      if (!html) {
+        html = <li>{message.content}</li>;
+      }
+    }
+    setMessages((prevMessages) => [...prevMessages, {...message, html}]);
+  }, []);
+
   const startChat = useCallback(async () => {
     if (!chatSDK) {
       return;
@@ -63,7 +98,7 @@ function App() {
     await chatSDK?.onNewMessage((message: any) => {
       AppConfig.ChatSDK.onNewMessage.log && console.log(`New message!`);
       AppConfig.ChatSDK.onNewMessage.log && console.log(message?.content);
-      setMessages((prevMessages) => [...prevMessages, message]);
+      newMessageHandler(message);
     });
 
     setWidgetState(WidgetState.CHAT);
@@ -115,6 +150,10 @@ function App() {
           <WidgetContent>
             <div style={{display: 'flex', flexDirection: 'column', fontSize: '12px', height: '100%'}}>
               {messages.map((message, index) => {
+                if (message.html) {
+                  return <>{message.html}</>
+                }
+
                 return (
                   <li> {message.content} </li>
                 );
