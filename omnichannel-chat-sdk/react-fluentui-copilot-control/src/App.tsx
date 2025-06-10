@@ -73,6 +73,18 @@ function App() {
                 </div>
               );
             }
+          } else {
+            if (data.attachments.length > 0) {
+              const adaptiveCard = new AdaptiveCards.AdaptiveCard();
+              adaptiveCard.parse(data.attachments[0].content);
+              let renderedCard = adaptiveCard.render();
+              html = (
+                <div ref={(n) => { // Returns React element
+                  n && n.firstChild && n.removeChild(n.firstChild); // Removes duplicates fix
+                  renderedCard && n && n.appendChild(renderedCard);
+                }} />
+              );
+            }
           }
         } catch (error) {
           console.log(error);
