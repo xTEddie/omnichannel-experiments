@@ -10,6 +10,7 @@ import './App.css'
 function App() {
   const [widgetState, setWidgetState] = useState(WidgetState.UNKNOWN);
   const [chatSDK, setChatSDK] = useState<OmnichannelChatSDK>();
+  const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
     const init = async () => {
@@ -58,6 +59,7 @@ function App() {
     await chatSDK?.onNewMessage((message: any) => {
       AppConfig.ChatSDK.onNewMessage.log && console.log(`New message!`);
       AppConfig.ChatSDK.onNewMessage.log && console.log(message?.content);
+      setMessages((prevMessages) => [...prevMessages, message]);
     });
 
     setWidgetState(WidgetState.CHAT);
