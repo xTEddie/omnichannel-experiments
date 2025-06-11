@@ -77,6 +77,15 @@ function App() {
             if (data.attachments.length > 0) {
               const adaptiveCard = new AdaptiveCards.AdaptiveCard();
               adaptiveCard.parse(data.attachments[0].content);
+
+              adaptiveCard.onExecuteAction = async (action: any) => {
+                const submitCardResponse = action.data;
+                const content = JSON.stringify({value: submitCardResponse});
+                const response = await chatSDK?.sendMessage({content, metadata: {
+                  "microsoft.azure.communication.chat.bot.contenttype": "azurebotservice.adaptivecard"
+                }});
+              };
+
               let renderedCard = adaptiveCard.render();
               html = (
                 <div ref={(n) => { // Returns React element
@@ -96,7 +105,7 @@ function App() {
       }
     }
     setMessages((prevMessages) => [...prevMessages, {...message, html}]);
-  }, []);
+  }, [chatSDK]);
 
   const startChat = useCallback(async () => {
     if (!chatSDK) {
