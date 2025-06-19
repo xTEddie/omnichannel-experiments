@@ -13,6 +13,7 @@ interface WidgetConfigurationsProps {
 
 const LiveChatConfigurations = (props: WidgetConfigurationsProps) => {
   const [isAuthenticatedChat, setIsAuthenticatedChat] = useState(false);
+  const [isAttachmentEnabled, setIsAttachmentEnabled] = useState(false);
   const [isPersistentChat, setIsPersistentChat] = useState(false);
   const [isChatReconnect, setIsChatReconnect] = useState(false);
   const [isOperatingHours, setIsOperatingHours] = useState(false);
@@ -24,9 +25,10 @@ const LiveChatConfigurations = (props: WidgetConfigurationsProps) => {
   useEffect(() => {
     if (props.chatConfig) {
       const {LiveChatConfigOperatingHoursSettings, LiveChatConfigAuthSettings, LiveWSAndLiveChatEngJoin} = props.chatConfig;
-      const {msdyn_conversationmode, msdyn_enablechatreconnect} = LiveWSAndLiveChatEngJoin;
+      const {msdyn_enablefileattachmentsforagents, msdyn_enablefileattachmentsforcustomers, msdyn_conversationmode, msdyn_enablechatreconnect} = LiveWSAndLiveChatEngJoin;
       const {OutOfOperatingHours, msdyn_prechatenabled, msdyn_postconversationsurveyenable, msdyn_callingoptions} = LiveWSAndLiveChatEngJoin;
       setIsAuthenticatedChat(LiveChatConfigAuthSettings?? false);
+      setIsAttachmentEnabled(parseLowerCaseString(msdyn_enablefileattachmentsforagents) === 'true' || parseLowerCaseString(msdyn_enablefileattachmentsforcustomers) === 'true');
       setIsPersistentChat(msdyn_conversationmode === "192350001");
       setIsChatReconnect(msdyn_conversationmode === "192350000" && parseLowerCaseString(msdyn_enablechatreconnect) === 'true');
       setIsOperatingHours(LiveChatConfigOperatingHoursSettings?? false);
@@ -51,6 +53,10 @@ const LiveChatConfigurations = (props: WidgetConfigurationsProps) => {
         <div>
           <span> Authenticated </span>
           <input type="checkbox" checked={isAuthenticatedChat} readOnly />
+        </div>
+        <div>
+          <span> Attachment </span>
+          <input type="checkbox" checked={isAttachmentEnabled} readOnly />
         </div>
         <div>
           <span> Reconnect Chat </span>
