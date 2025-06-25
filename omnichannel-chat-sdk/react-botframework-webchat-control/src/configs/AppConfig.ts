@@ -9,6 +9,9 @@ const AppConfig = {
     onNewMessage: {
       log: false
     },
+    onAgentEndSession: {
+      log: false
+    },
     liveChatContext: {
       log: true,
       reset: false, // Reset the live chat context on init

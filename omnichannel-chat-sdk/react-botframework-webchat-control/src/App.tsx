@@ -264,6 +264,8 @@ function App() {
     setWidgetState(WidgetState.CHAT);
     console.log("Chat started!");
     await chatSDK?.onAgentEndSession(() => {
+      AppConfig.ChatSDK.onAgentEndSession.log && console.log(`Agent ended session!`);
+
       setConversationEndedByAgentFirst(true);
       if (isPostChatSurvey && AppConfig.widget.postChatSurveyPane.disabled === false) {
         setWidgetState(WidgetState.ENDED);
