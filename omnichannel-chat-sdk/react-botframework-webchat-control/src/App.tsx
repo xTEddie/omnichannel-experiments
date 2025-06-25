@@ -2,6 +2,7 @@ import * as AdaptiveCards from 'adaptivecards';
 import { useCallback, useEffect, useState, Fragment } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
+import { createStore } from "botframework-webchat";
 import ReactWebChat from 'botframework-webchat';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
@@ -46,6 +47,9 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [styleOptions, setStyleOptions] = useState<any>({});
   const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
+  const store = createStore(
+    {} // initial state
+  );
 
   useEffect(() => {
     const init = async () => {
@@ -342,7 +346,7 @@ function App() {
       <h1>ChatSDK Sample</h1>
       <AppDetails />
       <LiveChatConfigurations chatConfig={chatConfig} />
-      <ChatCommands startChat={startChat} endChat={endChat}/>
+      <ChatCommands startChat={startChat} endChat={endChat} />
       {widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
@@ -379,6 +383,7 @@ function App() {
           {chatAdapter &&
             <WebChatThemeProvider>
               <ReactWebChat
+                store={store}
                 directLine={chatAdapter}
                 styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
                 activityMiddleware={createActivityMiddleware()}
