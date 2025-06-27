@@ -2,12 +2,14 @@ import * as AdaptiveCards from 'adaptivecards';
 import { useCallback, useEffect, useState, Fragment } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
+import { createStore } from "botframework-webchat";
 import ReactWebChat from 'botframework-webchat';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
 import fetchDebugConfig from './utils/fetchDebugConfig';
 import fetchOmnichannelConfig from './utils/fetchOmnichannelConfig';
 import fetchChatSDKConfig from './utils/fetchChatSDKConfig';
+import fetchChatReconnectConfig from './utils/fetchChatReconnectConfig';
 import fetchAuthToken from './utils/fetchAuthToken';
 import ChatButton from './components/ChatButton/ChatButton';
 import ChatCommands from './components/ChatCommands/ChatCommands';
@@ -15,6 +17,7 @@ import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
 import createAttachmentMiddleware from './middlewares/native/createAttachmentMiddleware';
 import createCardActionMiddleware from './middlewares/native/createCardActionMiddleware';
+import createSendBoxMiddleware from './middlewares/native/createSendBoxMiddleware';
 import LiveChatConfigurations from './components/LiveChatConfigurations/LiveChatConfigurations';
 import WidgetContainer from './components/WidgetContainer/WidgetContainer';
 import WidgetContent from './components/WidgetContent/WidgetContent';
@@ -37,6 +40,7 @@ function App() {
   const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
   const [isPreChatSurveyEnabled, setIsPreChatSurveyEnabled] = useState(false);
+  const [isChatReconnect, setIsChatReconnect] = useState(false);
   const [renderedPreChatSurveyCard, setRenderedPreChatSurveyCard] = useState<any>(undefined);
   const [preChatResponse, setPreChatResponse] = useState<any>(undefined);
   const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
@@ -45,6 +49,10 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [styleOptions, setStyleOptions] = useState<any>({});
   const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
+  const chatReconnectConfig = fetchChatReconnectConfig();
+  const store = createStore(
+    {} // initial state
+  );
 
   useEffect(() => {
     const init = async () => {
@@ -72,12 +80,12 @@ function App() {
       }
 
       const {LiveWSAndLiveChatEngJoin} = chatConfig;
-      const {OutOfOperatingHours, msdyn_prechatenabled, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
+      const {OutOfOperatingHours, msdyn_conversationmode, msdyn_enablechatreconnect, msdyn_prechatenabled, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
       setIsPreChatSurveyEnabled(parseLowerCaseString(msdyn_prechatenabled) === 'true');
       setPostChatSurveyMode(msdyn_postconversationsurveymode);
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
+      setIsChatReconnect(msdyn_conversationmode === "192350000" && parseLowerCaseString(msdyn_enablechatreconnect) === 'true');
       setIsPostChatSurvey(parseLowerCaseString(msdyn_postconversationsurveyenable) === 'true');
-
       setWidgetState(WidgetState.READY);
     }
 
@@ -172,7 +180,20 @@ function App() {
       cachedLiveChatContext = getLiveChatContextFromCache();
     }
 
-    if (widgetState === WidgetState.READY && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false && !cachedLiveChatContext) {
+    const optionalParams: any = {};
+    let skipPreChatSurvey = false;
+    if (widgetState === WidgetState.READY && isChatReconnect) {
+      if (chatReconnectConfig?.reconnectId) {
+        const {reconnectId} = chatReconnectConfig;
+        const chatReconnectContext = await chatSDK?.getChatReconnectContext({reconnectId});
+        if (chatReconnectContext?.reconnectId) {
+          optionalParams.reconnectId = chatReconnectConfig.reconnectId;
+          skipPreChatSurvey = true;
+        }
+      }
+    }
+
+    if (widgetState === WidgetState.READY && !skipPreChatSurvey && isPreChatSurveyEnabled && AppConfig.widget.preChatSurveyPane.disabled === false && !cachedLiveChatContext) {
       const adaptiveCard = new AdaptiveCards.AdaptiveCard();
       const preChatSurveyRaw = await chatSDK?.getPreChatSurvey(false);
       const preChatSurvey = JSON.parse(preChatSurveyRaw.replaceAll("&#42;", "*")); // HTML entities '&#42;' is not unescaped for some reason
@@ -216,7 +237,6 @@ function App() {
       setWidgetState(WidgetState.LOADING);
     }
 
-    const optionalParams: any = {};
     if (preChatResponse && AppConfig.widget.preChatSurveyPane.disabled === false) {
       optionalParams.preChatResponse = preChatResponse;
     }
@@ -263,13 +283,10 @@ function App() {
     setWidgetState(WidgetState.CHAT);
     console.log("Chat started!");
     await chatSDK?.onAgentEndSession(() => {
+      AppConfig.ChatSDK.onAgentEndSession.log && console.log(`Agent ended session!`);
+
       setConversationEndedByAgentFirst(true);
       if (isPostChatSurvey && AppConfig.widget.postChatSurveyPane.disabled === false) {
-        if (postChatSurveyMode === PostChatSurveyMode.Link) {
-          setWidgetState(WidgetState.READONLY);
-          return;
-        }
-
         setWidgetState(WidgetState.ENDED);
       }
     });
@@ -280,7 +297,7 @@ function App() {
 
     const chatAdapter = await chatSDK?.createChatAdapter();
     setChatAdapter(chatAdapter);
-  }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isPreChatSurveyEnabled, preChatResponse]);
+  }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isChatReconnect, isPreChatSurveyEnabled, preChatResponse]);
 
   const endChat = useCallback(async () => {
     if (widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false) {
@@ -344,7 +361,7 @@ function App() {
       <h1>ChatSDK Sample</h1>
       <AppDetails />
       <LiveChatConfigurations chatConfig={chatConfig} />
-      <ChatCommands startChat={startChat} endChat={endChat}/>
+      <ChatCommands startChat={startChat} endChat={endChat} />
       {widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false && <WidgetContainer>
         <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           <WidgetContent>
@@ -381,11 +398,13 @@ function App() {
           {chatAdapter &&
             <WebChatThemeProvider>
               <ReactWebChat
+                store={store}
                 directLine={chatAdapter}
                 styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
                 activityMiddleware={createActivityMiddleware()}
                 attachmentMiddleware={createAttachmentMiddleware()}
                 cardActionMiddleware={createCardActionMiddleware()}
+                sendBoxMiddleware={createSendBoxMiddleware()}
               />
             </WebChatThemeProvider>
           }

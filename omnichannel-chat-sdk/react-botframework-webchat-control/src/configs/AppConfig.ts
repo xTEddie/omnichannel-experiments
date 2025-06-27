@@ -9,6 +9,9 @@ const AppConfig = {
     onNewMessage: {
       log: false
     },
+    onAgentEndSession: {
+      log: false
+    },
     liveChatContext: {
       log: true,
       reset: false, // Reset the live chat context on init
@@ -18,7 +21,7 @@ const AppConfig = {
   },
   components: {
     WidgetContainer: {
-      log: true
+      log: false
     }
   },
   widget: {
@@ -74,6 +77,9 @@ const AppConfig = {
     cardActionMiddleware: {
       disabled: false,
       log: false // Log card action middleware events
+    },
+    sendBoxMiddleware: {
+      disabled: true
     }
   }
 };
