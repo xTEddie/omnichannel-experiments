@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, Fragment } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
 import { createStore } from "botframework-webchat";
-import ReactWebChat from 'botframework-webchat';
+import { Components } from 'botframework-webchat';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
 import fetchDebugConfig from './utils/fetchDebugConfig';
@@ -50,6 +50,7 @@ function App() {
   const [styleOptions, setStyleOptions] = useState<any>({});
   const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
   const chatReconnectConfig = fetchChatReconnectConfig();
+  const { Composer, BasicWebChat } = Components;
   const store = createStore(
     {} // initial state
   );
@@ -397,7 +398,7 @@ function App() {
         <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
           {chatAdapter &&
             <WebChatThemeProvider>
-              <ReactWebChat
+              <Composer
                 store={store}
                 directLine={chatAdapter}
                 styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
@@ -405,7 +406,9 @@ function App() {
                 attachmentMiddleware={createAttachmentMiddleware()}
                 cardActionMiddleware={createCardActionMiddleware()}
                 sendBoxMiddleware={createSendBoxMiddleware()}
-              />
+              >
+                <BasicWebChat />
+              </Composer>
             </WebChatThemeProvider>
           }
         </WidgetContainer>
