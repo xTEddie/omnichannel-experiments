@@ -298,7 +298,7 @@ function App() {
     });
 
     let chatAdapter = await chatSDK?.createChatAdapter();
-    if (AppConfig.WebChat.superChatAdapter.disabled === true) {
+    if (AppConfig.WebChat.superChatAdapter.disabled === false) {
       chatAdapter = useSuperChatAdapter(await chatSDK?.createChatAdapter());
     }
     setChatAdapter(chatAdapter);
