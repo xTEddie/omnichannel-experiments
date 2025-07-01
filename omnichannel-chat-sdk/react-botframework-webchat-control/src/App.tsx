@@ -24,6 +24,7 @@ import WidgetContent from './components/WidgetContent/WidgetContent';
 import WidgetState from './common/WidgetState';
 import getLiveChatContextFromCache from './utils/getLiveChatContextFromCache';
 import parseLowerCaseString from './utils/parseLowerCaseString';
+import useSuperChatAdapter from './utils/useSuperChatAdapter';
 import './App.css';
 
 enum PostChatSurveyMode {
@@ -296,7 +297,10 @@ function App() {
       AppConfig.ChatSDK.onNewMessage.log && console.log(message?.content);
     });
 
-    const chatAdapter = await chatSDK?.createChatAdapter();
+    let chatAdapter = await chatSDK?.createChatAdapter();
+    if (AppConfig.WebChat.superChatAdapter.disabled === true) {
+      chatAdapter = useSuperChatAdapter(await chatSDK?.createChatAdapter());
+    }
     setChatAdapter(chatAdapter);
   }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isChatReconnect, isPreChatSurveyEnabled, preChatResponse]);
 
