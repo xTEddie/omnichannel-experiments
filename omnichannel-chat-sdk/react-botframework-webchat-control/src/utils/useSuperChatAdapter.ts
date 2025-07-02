@@ -23,6 +23,22 @@ class DefaultActivitySubscriber implements IActivitySubscriber {
   }
 }
 
+class AddActivitySubscriber implements IActivitySubscriber {
+  public observer: any;
+
+  constructor() {
+    window.addEventListener('CHAT_WIDGET/ADD_ACTIVITY', (event: any) => {
+      if (event?.detail?.payload?.activity) {
+        this.observer.next(event.detail.payload.activity);
+      }
+    });
+  }
+
+  public async next(activity: any) {
+    return activity;
+  }
+}
+
 /**
  * Wrapper around the original chat adapter to allow 
  * adding new subscribers to modify activities.
@@ -74,6 +90,7 @@ class SuperChatAdapter {
 
 const useSuperChatAdapter = (chatAdapter: any) => {
   let adapter = new SuperChatAdapter(chatAdapter);
+  adapter.addSubscriber(new AddActivitySubscriber());
   return adapter.chatAdapter;
 };
 
