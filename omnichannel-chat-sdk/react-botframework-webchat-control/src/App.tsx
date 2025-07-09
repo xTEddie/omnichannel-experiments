@@ -398,23 +398,21 @@ function App() {
           </WidgetContent>
         </WidgetContainer>
       }
-      { (widgetState === WidgetState.CHAT || (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false)) && <WidgetContainer>
+      { (chatAdapter || widgetState === WidgetState.CHAT || (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false)) && <WidgetContainer style={{display: widgetState === WidgetState.MINIMIZED ? 'none': 'flex'}}>
         <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
-          {chatAdapter &&
-            <WebChatThemeProvider>
-              <Composer
-                store={store.current}
-                directLine={chatAdapter}
-                styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
-                activityMiddleware={createActivityMiddleware()}
-                attachmentMiddleware={createAttachmentMiddleware()}
-                cardActionMiddleware={createCardActionMiddleware()}
-                sendBoxMiddleware={createSendBoxMiddleware()}
-              >
-                <BasicWebChat />
-              </Composer>
-            </WebChatThemeProvider>
-          }
+          <WebChatThemeProvider>
+            <Composer
+              store={store.current}
+              directLine={chatAdapter}
+              styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
+              activityMiddleware={createActivityMiddleware()}
+              attachmentMiddleware={createAttachmentMiddleware()}
+              cardActionMiddleware={createCardActionMiddleware()}
+              sendBoxMiddleware={createSendBoxMiddleware()}
+            >
+              <BasicWebChat />
+            </Composer>
+          </WebChatThemeProvider>
         </WidgetContainer>
       }
       { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
