@@ -1,5 +1,5 @@
 import * as AdaptiveCards from 'adaptivecards';
-import { useCallback, useEffect, useState, Fragment } from 'react'
+import { useCallback, useEffect, useState, Fragment, useRef } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
 import { createStore } from "botframework-webchat";
@@ -52,9 +52,9 @@ function App() {
   const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
   const chatReconnectConfig = fetchChatReconnectConfig();
   const { Composer, BasicWebChat } = Components;
-  const store = createStore(
+  const store = useRef(createStore(
     {} // initial state
-  );
+  ));
 
   useEffect(() => {
     const init = async () => {
@@ -403,7 +403,7 @@ function App() {
           {chatAdapter &&
             <WebChatThemeProvider>
               <Composer
-                store={store}
+                store={store.current}
                 directLine={chatAdapter}
                 styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
                 activityMiddleware={createActivityMiddleware()}
