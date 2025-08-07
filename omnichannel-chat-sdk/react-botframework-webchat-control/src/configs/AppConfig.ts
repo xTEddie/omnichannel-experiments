@@ -49,7 +49,7 @@ const AppConfig = {
     }
   },
   WebChat: {
-    superChatAdapter:{
+    superChatAdapter: {
       disabled: false
     },
     FluentThemeProvider: {
