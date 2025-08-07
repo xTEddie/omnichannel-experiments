@@ -2,20 +2,26 @@ import { version as chatSDKversion } from '@microsoft/omnichannel-chat-sdk/packa
 import { version as OCSDKVersion } from '@microsoft/ocsdk/package.json';
 import { version as webChatVersion } from 'botframework-webchat/package.json';
 import { version as chatAdapterVersion } from '@microsoft/botframework-webchat-adapter-azure-communication-chat/package.json';
+import { version as amsClientVersion } from '@microsoft/omnichannel-amsclient/package.json';
 import { useEffect } from 'react';
 
 const AppDetails = () => {
   useEffect(() => {
     console.log(`ocsdk@${OCSDKVersion}`);
+    console.log(`amsclient@${amsClientVersion}`);
     console.log(`omnichannel-chat-sdk@${chatSDKversion}`);
     console.log(`botframework-webchat@${webChatVersion}`);
-    console.log(`botframework-webchat-adapter-azure-communication-chat@${chatAdapterVersion}`)
+    console.log(`botframework-webchat-adapter-azure-communication-chat@${chatAdapterVersion}`);
   }, []);
 
   const packageVersions = [
     {
       name: 'ocsdk',
       version: OCSDKVersion
+    },
+    {
+      name: 'amsclient',
+      version: amsClientVersion
     },
     {
       name: 'omnichannel-chat-sdk',
