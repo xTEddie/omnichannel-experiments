@@ -49,6 +49,9 @@ const AppConfig = {
     }
   },
   WebChat: {
+    superChatAdapter: {
+      disabled: false
+    },
     FluentThemeProvider: {
       disabled: false
     },

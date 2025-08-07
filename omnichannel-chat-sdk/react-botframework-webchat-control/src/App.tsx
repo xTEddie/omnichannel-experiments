@@ -1,9 +1,9 @@
 import * as AdaptiveCards from 'adaptivecards';
-import { useCallback, useEffect, useState, Fragment } from 'react'
+import { useCallback, useEffect, useState, Fragment, useRef } from 'react'
 import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
 import { createStore } from "botframework-webchat";
-import ReactWebChat from 'botframework-webchat';
+import { Components } from 'botframework-webchat';
 import AppConfig from './configs/AppConfig';
 import AppDetails from './components/AppDetails/AppDetails';
 import fetchDebugConfig from './utils/fetchDebugConfig';
@@ -24,6 +24,7 @@ import WidgetContent from './components/WidgetContent/WidgetContent';
 import WidgetState from './common/WidgetState';
 import getLiveChatContextFromCache from './utils/getLiveChatContextFromCache';
 import parseLowerCaseString from './utils/parseLowerCaseString';
+import useSuperChatAdapter from './utils/useSuperChatAdapter';
 import './App.css';
 
 enum PostChatSurveyMode {
@@ -50,9 +51,10 @@ function App() {
   const [styleOptions, setStyleOptions] = useState<any>({});
   const [conversationEndedByAgentFirst, setConversationEndedByAgentFirst] = useState(false);
   const chatReconnectConfig = fetchChatReconnectConfig();
-  const store = createStore(
+  const { Composer, BasicWebChat } = Components;
+  const store = useRef(createStore(
     {} // initial state
-  );
+  ));
 
   useEffect(() => {
     const init = async () => {
@@ -295,7 +297,10 @@ function App() {
       AppConfig.ChatSDK.onNewMessage.log && console.log(message?.content);
     });
 
-    const chatAdapter = await chatSDK?.createChatAdapter();
+    let chatAdapter = await chatSDK?.createChatAdapter();
+    if (AppConfig.WebChat.superChatAdapter.disabled === false) {
+      chatAdapter = useSuperChatAdapter(await chatSDK?.createChatAdapter());
+    }
     setChatAdapter(chatAdapter);
   }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isChatReconnect, isPreChatSurveyEnabled, preChatResponse]);
 
@@ -393,21 +398,21 @@ function App() {
           </WidgetContent>
         </WidgetContainer>
       }
-      { (widgetState === WidgetState.CHAT || (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false)) && <WidgetContainer>
+      { (chatAdapter || widgetState === WidgetState.CHAT || (widgetState === WidgetState.READONLY && AppConfig.widget.postChatSurveyPane.disabled === false)) && <WidgetContainer style={{display: widgetState === WidgetState.MINIMIZED ? 'none': 'flex'}}>
         <ChatHeader onClose={endChat} onMinimize={onMinimize}/>
-          {chatAdapter &&
-            <WebChatThemeProvider>
-              <ReactWebChat
-                store={store}
-                directLine={chatAdapter}
-                styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
-                activityMiddleware={createActivityMiddleware()}
-                attachmentMiddleware={createAttachmentMiddleware()}
-                cardActionMiddleware={createCardActionMiddleware()}
-                sendBoxMiddleware={createSendBoxMiddleware()}
-              />
-            </WebChatThemeProvider>
-          }
+          <WebChatThemeProvider>
+            <Composer
+              store={store.current}
+              directLine={chatAdapter}
+              styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
+              activityMiddleware={createActivityMiddleware()}
+              attachmentMiddleware={createAttachmentMiddleware()}
+              cardActionMiddleware={createCardActionMiddleware()}
+              sendBoxMiddleware={createSendBoxMiddleware()}
+            >
+              <BasicWebChat />
+            </Composer>
+          </WebChatThemeProvider>
         </WidgetContainer>
       }
       { widgetState === WidgetState.POSTCHATSURVEY && AppConfig.widget.postChatSurveyPane.disabled === false && <WidgetContainer>
