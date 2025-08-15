@@ -424,7 +424,7 @@ function App() {
               directLine={chatAdapter}
               styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
               activityMiddleware={createActivityMiddleware()}
-              activityStatusMiddleware={createActivityStatusMiddleware()}
+              activityStatusMiddleware={createActivityStatusMiddleware(locale)}
               attachmentMiddleware={createAttachmentMiddleware()}
               cardActionMiddleware={createCardActionMiddleware()}
               sendBoxMiddleware={createSendBoxMiddleware()}
