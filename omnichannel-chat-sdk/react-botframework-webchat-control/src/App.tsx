@@ -15,6 +15,7 @@ import ChatButton from './components/ChatButton/ChatButton';
 import ChatCommands from './components/ChatCommands/ChatCommands';
 import ChatHeader from './components/ChatHeader/ChatHeader';
 import createActivityMiddleware from './middlewares/native/createActivityMiddleware';
+import createActivityStatusMiddleware from './middlewares/native/createActivityStatusMiddleware';
 import createAttachmentMiddleware from './middlewares/native/createAttachmentMiddleware';
 import createCardActionMiddleware from './middlewares/native/createCardActionMiddleware';
 import createSendBoxMiddleware from './middlewares/native/createSendBoxMiddleware';
@@ -418,6 +419,7 @@ function App() {
               directLine={chatAdapter}
               styleOptions={{...AppConfig.WebChat.styleOptions, ...styleOptions}}
               activityMiddleware={createActivityMiddleware()}
+              activityStatusMiddleware={createActivityStatusMiddleware()}
               attachmentMiddleware={createAttachmentMiddleware()}
               cardActionMiddleware={createCardActionMiddleware()}
               sendBoxMiddleware={createSendBoxMiddleware()}
