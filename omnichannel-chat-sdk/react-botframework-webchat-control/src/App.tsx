@@ -27,6 +27,11 @@ import parseLowerCaseString from './utils/parseLowerCaseString';
 import useSuperChatAdapter from './utils/useSuperChatAdapter';
 import './App.css';
 
+enum ConversationMode {
+  LiveChat = '192350000',
+  PersistentChat = '192350001'
+};
+
 enum PostChatSurveyMode {
   Embed = '192350000',
   Link = '192350001'
@@ -86,7 +91,7 @@ function App() {
       setIsPreChatSurveyEnabled(parseLowerCaseString(msdyn_prechatenabled) === 'true');
       setPostChatSurveyMode(msdyn_postconversationsurveymode);
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
-      setIsChatReconnect(msdyn_conversationmode === "192350000" && parseLowerCaseString(msdyn_enablechatreconnect) === 'true');
+      setIsChatReconnect(msdyn_conversationmode === ConversationMode.LiveChat && parseLowerCaseString(msdyn_enablechatreconnect) === 'true');
       setIsPostChatSurvey(parseLowerCaseString(msdyn_postconversationsurveyenable) === 'true');
       setWidgetState(WidgetState.READY);
     }
