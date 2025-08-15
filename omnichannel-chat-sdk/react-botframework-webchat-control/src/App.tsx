@@ -291,13 +291,15 @@ function App() {
 
       throw error;
     }
-    const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
-    if (!isPersistentChat) {
-      setLiveChatContext(liveChatContext);
-    }
 
-    if (AppConfig.ChatSDK.liveChatContext.cache) {
-      localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
+    // Skip liveChatContext when not applicable
+    if (!isPersistentChat) {
+      const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
+      setLiveChatContext(liveChatContext);
+
+      if (AppConfig.ChatSDK.liveChatContext.cache) {
+        localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
+      }
     }
 
     setWidgetState(WidgetState.CHAT);
