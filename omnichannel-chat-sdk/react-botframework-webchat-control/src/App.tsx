@@ -1,6 +1,6 @@
 import * as AdaptiveCards from 'adaptivecards';
 import { useCallback, useEffect, useState, Fragment, useRef } from 'react'
-import { OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
+import { getLocaleStringFromId, OmnichannelChatSDK } from '@microsoft/omnichannel-chat-sdk';
 import { FluentThemeProvider } from 'botframework-webchat-fluent-theme';
 import { createStore } from "botframework-webchat";
 import { Components } from 'botframework-webchat';
@@ -45,6 +45,7 @@ function App() {
   const [chatConfig, setChatConfig] = useState<any>(undefined);
   const [chatAdapter, setChatAdapter] = useState<any>(undefined);
   const [liveChatContext, setLiveChatContext] = useState<any>(undefined);
+  const [locale, setLocale] = useState<string>('');
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
   const [isPreChatSurveyEnabled, setIsPreChatSurveyEnabled] = useState(false);
   const [isChatReconnect, setIsChatReconnect] = useState(false);
@@ -88,8 +89,9 @@ function App() {
         localStorage.removeItem('liveChatContext');
       }
 
-      const {LiveWSAndLiveChatEngJoin} = chatConfig;
+      const {ChatWidgetLanguage: { msdyn_localeid }, LiveWSAndLiveChatEngJoin} = chatConfig;
       const {OutOfOperatingHours, msdyn_conversationmode, msdyn_enablechatreconnect, msdyn_prechatenabled, msdyn_postconversationsurveyenable, msdyn_postconversationsurveymode} = LiveWSAndLiveChatEngJoin;
+      setLocale(getLocaleStringFromId(msdyn_localeid));
       setIsPreChatSurveyEnabled(parseLowerCaseString(msdyn_prechatenabled) === 'true');
       setPostChatSurveyMode(msdyn_postconversationsurveymode);
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
