@@ -47,6 +47,7 @@ function App() {
   const [isOutOfOperatingHours, setIsOutOfOperatingHours] = useState(false);
   const [isPreChatSurveyEnabled, setIsPreChatSurveyEnabled] = useState(false);
   const [isChatReconnect, setIsChatReconnect] = useState(false);
+  const [isPersistentChat, setIsPersistentChat] = useState(false);
   const [renderedPreChatSurveyCard, setRenderedPreChatSurveyCard] = useState<any>(undefined);
   const [preChatResponse, setPreChatResponse] = useState<any>(undefined);
   const [isPostChatSurvey, setIsPostChatSurvey] = useState(false);
@@ -92,6 +93,7 @@ function App() {
       setPostChatSurveyMode(msdyn_postconversationsurveymode);
       setIsOutOfOperatingHours(parseLowerCaseString(OutOfOperatingHours) === 'true');
       setIsChatReconnect(msdyn_conversationmode === ConversationMode.LiveChat && parseLowerCaseString(msdyn_enablechatreconnect) === 'true');
+      setIsPersistentChat(msdyn_conversationmode === ConversationMode.PersistentChat);
       setIsPostChatSurvey(parseLowerCaseString(msdyn_postconversationsurveyenable) === 'true');
       setWidgetState(WidgetState.READY);
     }
