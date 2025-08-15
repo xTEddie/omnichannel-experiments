@@ -73,6 +73,10 @@ const AppConfig = {
         }
       }
     },
+    activityStatusMiddleware: {
+      disabled: false,
+      log: false // Log activity status middleware events
+    },
     attachmentMiddleware: {
       disabled: false,
       log: false // Log attachment middleware events
