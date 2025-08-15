@@ -290,7 +290,10 @@ function App() {
       throw error;
     }
     const liveChatContext = await chatSDK?.getCurrentLiveChatContext();
-    setLiveChatContext(liveChatContext);
+    if (!isPersistentChat) {
+      setLiveChatContext(liveChatContext);
+    }
+
     if (AppConfig.ChatSDK.liveChatContext.cache) {
       localStorage.setItem('liveChatContext', JSON.stringify(liveChatContext));
     }
@@ -315,7 +318,7 @@ function App() {
       chatAdapter = useSuperChatAdapter(await chatSDK?.createChatAdapter());
     }
     setChatAdapter(chatAdapter);
-  }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isChatReconnect, isPreChatSurveyEnabled, preChatResponse]);
+  }, [chatSDK, widgetState, recentWidgetState, errorMessage, isOutOfOperatingHours, isChatReconnect, isPersistentChat, isPreChatSurveyEnabled, preChatResponse]);
 
   const endChat = useCallback(async () => {
     if (widgetState === WidgetState.ERROR && AppConfig.widget.errorPane.disabled === false) {
